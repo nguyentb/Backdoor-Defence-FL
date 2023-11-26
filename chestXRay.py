@@ -1,6 +1,6 @@
+import numpy as np
 import pandas as pd
 import matplotlib
-
 matplotlib.use('TkAgg')
 import torch
 import matplotlib.pyplot as plt
@@ -68,7 +68,6 @@ for i, sample in enumerate(df_set):
         break
 fig = plt.figure()
 
-IMAGE_SIZE = [256, 256]
 EPOCHS = 20
 BATCH_SIZE = 64
 
@@ -79,8 +78,8 @@ train_df = df[df.Index.isin(train_val_list['image_list'].values)].reset_index(dr
 test_df = df[df.Index.isin(test_list['image_list'].values)].reset_index(drop=True)
 
 mean, std = [0.4914, 0.4822, 0.4465], [0.247, 0.243, 0.261]
-#
-IMAGE_SIZE = 320
+
+IMAGE_SIZE = 256
 composed_train = v2.Compose([v2.Resize((IMAGE_SIZE, IMAGE_SIZE)),  # Resize the image in a 32X32 shape
                              #  transforms.RandomRotation(20), # Randomly rotate some images by 20 degrees
                              #  transforms.RandomHorizontalFlip(0.1), # Randomly horizontal flip the images
@@ -104,3 +103,14 @@ composed_test = v2.Compose([v2.Resize((IMAGE_SIZE, IMAGE_SIZE)),
 
 train_dataset = ChestDataset(train_df, composed_train)
 test_dataset = ChestDataset(test_df, composed_test)
+ds_labels = train_df["Finding Labels"]
+
+
+class_to_idx = {_class: i for i, _class in enumerate(labels)}
+
+train_labels = []
+for i in ds_labels:
+    train_labels.append(class_to_idx[i.split('|')[0]])
+
+train_labels = np.array(train_labels)
+
