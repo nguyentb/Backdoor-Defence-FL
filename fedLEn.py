@@ -1,7 +1,5 @@
 import copy
-
 import matplotlib
-
 matplotlib.use('TkAgg')
 import torch
 from torchvision.datasets import CIFAR10
@@ -10,40 +8,28 @@ import torchvision.transforms as transforms
 import numpy as np
 import matplotlib.pyplot as plt
 from torchvision.models import resnet
+import attack
+from chestXRay import train_dataset, test_dataset, train_labels, class_to_idx
 
-mean, std = [0.4914, 0.4822, 0.4465], [0.247, 0.243, 0.261]
 
-IMAGE_SIZE = 32
-composed_train = transforms.Compose([transforms.Resize((IMAGE_SIZE, IMAGE_SIZE)),  # Resize the image in a 32X32 shape
-                                     # transforms.RandomRotation(20), # Randomly rotate some images by 20 degrees
-                                     # transforms.RandomHorizontalFlip(0.1), # Randomly horizontal flip the images
-                                     # transforms.ColorJitter(brightness = 0.1, # Randomly adjust color jitter of the images
-                                     #                        contrast = 0.1,
-                                     #                        saturation = 0.1),
-                                     # transforms.RandomAdjustSharpness(sharpness_factor = 2,
-                                     #                                  p = 0.1), # Randomly adjust sharpness
-                                     transforms.ToTensor(),  # Converting image to tensor
-                                     transforms.Normalize(mean, std),
-                                     # Normalizing with standard mean and standard deviation
-                                     transforms.RandomErasing(p=0.75, scale=(0.02, 0.1), value=1.0, inplace=False)])
+print(train_dataset)
 
-composed_test = transforms.Compose([transforms.Resize((IMAGE_SIZE, IMAGE_SIZE)),
-                                    transforms.ToTensor(),
-                                    transforms.Normalize(mean, std)])
 
-train_dataset = CIFAR10('./', train=True, download=True, transform=composed_train)
-test_dataset = CIFAR10('./', train=False, download=True, transform=composed_test)
-total_train_size = len(train_dataset)
-total_test_size = len(test_dataset)
+# poisoned_dataset, train_dataset = torch.utils.data.random_split(train_dataset, [0.001, 0.999])
 
 # Create train and validation batch for training
-train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=100)
-test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=100)
+# train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=100)
+# test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=100)
 
-data_iterable = iter(train_loader)  # converting our train_dataloader to iterable so that we can iter through it.
-images, labels = next(data_iterable)  # going from 1st batch of 100 images to the next batch
+# poisoned_loader = torch.utils.data.DataLoader(dataset=poisoned_dataset, batch_size=100)
 
-classes = 10
+# data_iterable = iter(train_loader)  # converting our train_dataloader to iterable so that we can iter through it.
+# images, labels = next(data_iterable)  # going from 1st batch of 100 images to the next batch
+#
+# print(images)
+
+classes = len(class_to_idx.keys())
+print(classes)
 input_dim = 784
 
 num_clients = 100
@@ -61,19 +47,6 @@ def to_device(data, device):
     if isinstance(data, (list, tuple)):
         return [to_device(x, device) for x in data]
     return data.to(device, non_blocking=True)
-
-
-class DeviceDataLoader(DataLoader):
-    def __init__(self, dl, device):
-        self.dl = dl
-        self.device = device
-
-    def __iter__(self):
-        for batch in self.dl:
-            yield to_device(batch, self.device)
-
-    def __len__(self):
-        return len(self.dl)
 
 
 class CustomDataset(Dataset):
@@ -95,14 +68,14 @@ device = get_device()
 class Client:
     def __init__(self, client_id, dataset, batchSize):
         self.train_loader = DataLoader(CustomDataset(dataset, client_id), batch_size=batchSize, shuffle=True)
+        # self.train_loader = dataset
 
     def train(self, model):
         criterion = torch.nn.CrossEntropyLoss()
         # optimizer = torch.optim.SGD(model.parameters(), lr=self.learning_rate, momentum=0.95, weight_decay = 5e-4)
-        optimizer = torch.optim.Adadelta(model.parameters(), lr=learning_rate)
+        optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
         # if self.sch_flag == True:
-        #    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5)
-        # my_lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.99)
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5)
         e_loss = []
         for epoch in range(1, epochs_per_client + 1):
             # print("Training client on epoch: ", epoch)
@@ -110,9 +83,7 @@ class Client:
 
             model.train()
             for data, labels in self.train_loader:
-                if data.size()[0] < 2:
-                    continue
-
+                print(data)
                 if torch.cuda.is_available():
                     data, labels = data.cuda(), labels.cuda()
 
@@ -129,7 +100,7 @@ class Client:
                 # update training loss
                 train_loss += loss.item() * data.size(0)
                 # if self.sch_flag == True:
-                #  scheduler.step(train_loss)
+                scheduler.step(train_loss)
             # average losses
             train_loss = train_loss / len(self.train_loader.dataset)
             e_loss.append(train_loss)
@@ -143,7 +114,6 @@ class Client:
 
 train_idcs = np.random.permutation(len(train_dataset))
 test_idcs = np.random.permutation(len(test_dataset))
-train_labels = np.array(train_dataset.targets)
 
 
 def testing(model, dataset, bs, criterion, num_classes, classes):
@@ -226,17 +196,20 @@ test_accuracy = []
 best_accuracy = 0
 history = []
 
-classes_test = np.array(list(test_dataset.class_to_idx.values()))
+classes_test = np.array(train_labels)
 criterion = torch.nn.CrossEntropyLoss()
 
-# client_dict = {i: np.array(client_idcs[i]) for i in range(num_clients)}
+# number_of_adversaries = 1
+# adversary_idx = num_clients - 1
+
+# attack.add_triggers(0.1, client_idcs[adversary_idx], train_dataset)
 for curr_round in range(1, rounds + 1):
     print('Start Round {} ...'.format(curr_round))
     w, local_loss = [], []
 
     m = max(int(0.1 * num_clients), 1)
+    # clients = np.random.choice(range(num_clients) - 1, m, replace=False)
     clients = np.random.choice(range(num_clients), m, replace=False)
-
     for client in clients:
         local_update = Client(dataset=train_dataset, batchSize=batch_size, client_id=client_idcs[client])
 
@@ -282,5 +255,5 @@ ax.plot(x_axis, y_axis3, 'tab:' + 'red', label='test_loss')
 ax.legend(loc='upper left')
 ax.set(xlabel='Number of Rounds', ylabel='Train Loss')
 ax.grid()
-# fig.savefig(plt_title+'.jpg', format='jpg')
+fig.savefig(plt_title+'.jpg', format='jpg')
 print("Training Done!")

@@ -28,11 +28,20 @@ class ChestDataset(Dataset):
         img = io.imread(img)
         img = Image.fromarray(img)
 
-        if self.transform is not None:
+        if self.transform:
             img = self.transform(img)
 
         sample = {'image': img, 'target': target}
 
         return sample
 
+    def __str__(self):
+        def concat_string(str, i):
+            i += 1
+            if i >= 5:
+                return str
+            return str + "\n" + concat_string(self.data[i] + " " + self.targets[i], i)
 
+        result = concat_string(self.data[0] + " " + self.targets[0], 0)
+
+        return result
