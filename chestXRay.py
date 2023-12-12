@@ -1,14 +1,13 @@
 import numpy as np
 import pandas as pd
-import matplotlib
-matplotlib.use('TkAgg')
 import torch
 import matplotlib.pyplot as plt
 from glob import glob
 from torchvision.transforms import v2
 from chestDataset import ChestDataset
+import matplotlib
+matplotlib.use('TkAgg')
 
-"""Download and transform input"""
 
 all_xray_df = pd.read_csv(".\\input\\chestxray8-dataframe\\train_df.csv")
 
@@ -20,13 +19,12 @@ bad_labels = pd.read_csv(data_dir2 + 'cxr14_bad_labels.csv')
 
 # Listing all the .jpg filepaths
 image_paths = glob(data_dir1 + 'images_*\\images\\*.png')
-print(f'Total image files found : {len(image_paths)}')
-print(f'Total number of image labels: {image_label_map.shape[0]}')
-print(f'Unique patients: {len(df["Patient ID"].unique())}')
+# print(f'Total image files found : {len(image_paths)}')
+# print(f'Total number of image labels: {image_label_map.shape[0]}')
+# print(f'Unique patients: {len(df["Patient ID"].unique())}')
 
 # image_label_map.drop(['No Finding'], axis = 1, inplace = True)
 labels = image_label_map.columns[2:-1]
-print(labels)
 
 labels = ['Cardiomegaly', 'Emphysema', 'Effusion', 'No Finding', 'Hernia',
           'Infiltration', 'Mass', 'Nodule', 'Atelectasis', 'Pneumothorax',
@@ -51,22 +49,38 @@ df_set = ChestDataset(df)
 
 def show(image, target):
     """Show image with landmarks"""
-    plt.imshow(image)
-    plt.title(target)
+    print(image.shape)
+    plt.imshow(image.permute(1, 2, 0))
+    plt.title(labels[target] + ": " + str(target))
     plt.pause(0.001)  # pause a bit so that plots are updated
 
 
+def add_cross(img):
+    for j in range(10, 110):
+        for i in range(40, 60):
+            img[0][j][i] = 255
+
+    for j in range(50, 70):
+        for i in range(20, 80):
+            img[0][j][i] = 255
+
+
 for i, sample in enumerate(df_set):
-    ax = plt.subplot(1, 4, i + 1)
+    ax = plt.subplot(2, 4, i + 1)
     plt.tight_layout()
     ax.set_title('Sample #{}'.format(i))
     ax.axis('off')
-    show(**sample)
+    image = sample["image"]
 
-    if i == 3:
+    add_cross(image)
+    show(image, sample["target"])
+
+    if i == 7:
         plt.show()
         break
+
 fig = plt.figure()
+
 
 EPOCHS = 20
 BATCH_SIZE = 64
@@ -77,10 +91,13 @@ test_list = pd.read_csv(data_dir1 + 'test_list.txt', header=None, names=['image_
 train_df = df[df.Index.isin(train_val_list['image_list'].values)].reset_index(drop=True)
 test_df = df[df.Index.isin(test_list['image_list'].values)].reset_index(drop=True)
 
+
 mean, std = [0.4914, 0.4822, 0.4465], [0.247, 0.243, 0.261]
 
 IMAGE_SIZE = 256
-composed_train = v2.Compose([v2.Resize((IMAGE_SIZE, IMAGE_SIZE)),  # Resize the image in a 32X32 shape
+composed_train = v2.Compose([v2.ToImage(),
+                             v2.ToDtype(torch.float32, scale=True),
+                             v2.Resize((IMAGE_SIZE, IMAGE_SIZE), antialias=True),
                              #  transforms.RandomRotation(20), # Randomly rotate some images by 20 degrees
                              #  transforms.RandomHorizontalFlip(0.1), # Randomly horizontal flip the images
                              #  transforms.ColorJitter(brightness = 0.1, # Randomly adjust color jitter of the images
@@ -88,15 +105,15 @@ composed_train = v2.Compose([v2.Resize((IMAGE_SIZE, IMAGE_SIZE)),  # Resize the 
                              #                         saturation = 0.1),
                              #  transforms.RandomAdjustSharpness(sharpness_factor = 2,
                              #                                   p = 0.1), # Randomly adjust sharpness
-                             v2.ToImage(),
-                             v2.ToDtype(torch.float32, scale=True),
+
                              v2.Normalize(mean, std),
                              # Normalizing with standard mean and standard deviation
                              #  transforms.RandomErasing(p=0.75, scale=(0.02, 0.1), value=1.0, inplace=False)
                              ])
 
-composed_test = v2.Compose([v2.Resize((IMAGE_SIZE, IMAGE_SIZE)),
-                            v2.ToImage(),
+composed_test = v2.Compose([v2.ToImage(),
+                            v2.ToDtype(torch.uint8, scale=True),
+                            v2.Resize((IMAGE_SIZE, IMAGE_SIZE), antialias=True),
                             v2.ToDtype(torch.float32, scale=True),
                             v2.Normalize(mean, std)
                             ])
