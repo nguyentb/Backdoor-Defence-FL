@@ -1,42 +1,25 @@
 import copy
-import matplotlib
-matplotlib.use('TkAgg')
 import torch
 from torchvision.datasets import CIFAR10
 from torch.utils.data import random_split, DataLoader, Subset, Dataset
 import torchvision.transforms as transforms
 import numpy as np
 import matplotlib.pyplot as plt
-from torchvision.models import resnet
+from torchvision.models import resnet, resnet18, resnet34
 import attack
-from chestXRay import train_dataset, test_dataset, train_labels, class_to_idx
-
-
-print(train_dataset)
-
+from chestXRay import train_dataset, test_dataset, train_labels, class_to_idx, df_set
+import matplotlib
+matplotlib.use('TkAgg')
 
 # poisoned_dataset, train_dataset = torch.utils.data.random_split(train_dataset, [0.001, 0.999])
 
-# Create train and validation batch for training
-# train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=100)
-# test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=100)
-
-# poisoned_loader = torch.utils.data.DataLoader(dataset=poisoned_dataset, batch_size=100)
-
-# data_iterable = iter(train_loader)  # converting our train_dataloader to iterable so that we can iter through it.
-# images, labels = next(data_iterable)  # going from 1st batch of 100 images to the next batch
-#
-# print(images)
-
 classes = len(class_to_idx.keys())
-print(classes)
-input_dim = 784
 
 num_clients = 100
 rounds = 100
 batch_size = 32
-epochs_per_client = 2
-learning_rate = 0.01
+epochs_per_client = 1
+learning_rate = 0.1
 
 
 def get_device():
@@ -58,32 +41,27 @@ class CustomDataset(Dataset):
         return len(self.idxs)
 
     def __getitem__(self, item):
-        image, label = self.dataset[self.idxs[item]]
-        return image, label
-
-
-device = get_device()
+        sample = self.dataset[self.idxs[item]]
+        return sample["image"], sample["target"]
 
 
 class Client:
-    def __init__(self, client_id, dataset, batchSize):
+    def __init__(self, client_id, dataset, batchSize, lr):
         self.train_loader = DataLoader(CustomDataset(dataset, client_id), batch_size=batchSize, shuffle=True)
-        # self.train_loader = dataset
+        self.lr = lr
 
     def train(self, model):
         criterion = torch.nn.CrossEntropyLoss()
-        # optimizer = torch.optim.SGD(model.parameters(), lr=self.learning_rate, momentum=0.95, weight_decay = 5e-4)
-        optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-        # if self.sch_flag == True:
+        optimizer = torch.optim.Adam(model.parameters(), lr=self.lr)
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5)
         e_loss = []
-        for epoch in range(1, epochs_per_client + 1):
-            # print("Training client on epoch: ", epoch)
+        for _ in range(1, epochs_per_client + 1):
             train_loss = 0.0
-
             model.train()
+
             for data, labels in self.train_loader:
-                print(data)
+                if data.size()[0] < 2:
+                    continue
                 if torch.cuda.is_available():
                     data, labels = data.cuda(), labels.cuda()
 
@@ -105,8 +83,6 @@ class Client:
             train_loss = train_loss / len(self.train_loader.dataset)
             e_loss.append(train_loss)
 
-            # self.learning_rate = optimizer.param_groups[0]['lr']
-
         total_loss = sum(e_loss) / len(e_loss)
 
         return model.state_dict(), total_loss
@@ -116,17 +92,17 @@ train_idcs = np.random.permutation(len(train_dataset))
 test_idcs = np.random.permutation(len(test_dataset))
 
 
-def testing(model, dataset, bs, criterion, num_classes, classes):
+def testing(model, dataset, bs, criterion):
     # test loss
     test_loss = 0.0
-    correct_class = list(0. for i in range(num_classes))
-    total_class = list(0. for i in range(num_classes))
+    correct_class = list(0. for _ in range(classes))
+    total_class = list(0. for _ in range(classes))
 
     test_loader = DataLoader(dataset, batch_size=bs)
-    l = len(test_loader)
     model.eval()
-    for data, labels in test_loader:
-
+    for sample in test_loader:
+        data = sample["image"]
+        labels = sample["target"]
         if torch.cuda.is_available():
             data, labels = data.cuda(), labels.cuda()
 
@@ -141,7 +117,7 @@ def testing(model, dataset, bs, criterion, num_classes, classes):
             correct_tensor.cpu().numpy())
 
         # test accuracy for each object class
-        for i in range(num_classes):
+        for i in range(classes):
             label = labels.data[i]
             correct_class[label] += correct[i].item()
             total_class[label] += 1
@@ -185,8 +161,18 @@ def split_noniid(train_idcs, train_labels, alpha, n_clients):
 
 client_idcs = split_noniid(train_idcs, train_labels, 1, num_clients)
 
-cifar_cnn = resnet.ResNet(resnet.BasicBlock, [2, 2, 2, 2], num_classes=10)
 
+def resnet_34():
+    # Define the resnet model
+    resnet = resnet34(weights='ResNet34_Weights.DEFAULT')
+    resnet.fc = torch.nn.Linear(resnet.fc.in_features, classes)
+    # Initialize with xavier uniform
+    torch.nn.init.xavier_uniform_(resnet.fc.weight)
+    return resnet
+
+
+device = get_device()
+cifar_cnn = resnet_34()
 global_net = to_device(cifar_cnn, device)
 
 global_weights = global_net.state_dict()
@@ -202,45 +188,51 @@ criterion = torch.nn.CrossEntropyLoss()
 # number_of_adversaries = 1
 # adversary_idx = num_clients - 1
 
+
+
 # attack.add_triggers(0.1, client_idcs[adversary_idx], train_dataset)
+
 for curr_round in range(1, rounds + 1):
     print('Start Round {} ...'.format(curr_round))
-    w, local_loss = [], []
+    local_weights, local_loss = [], []
 
     m = max(int(0.1 * num_clients), 1)
     # clients = np.random.choice(range(num_clients) - 1, m, replace=False)
     clients = np.random.choice(range(num_clients), m, replace=False)
     for client in clients:
-        local_update = Client(dataset=train_dataset, batchSize=batch_size, client_id=client_idcs[client])
+        local_update = Client(dataset=train_dataset, batchSize=batch_size, client_id=client_idcs[client],
+                              lr=learning_rate)
 
         weights, loss = local_update.train(model=copy.deepcopy(global_net))
 
-        w.append(copy.deepcopy(weights))
+        # store the weights and loss
+        local_weights.append(copy.deepcopy(weights))
         local_loss.append(copy.deepcopy(loss))
-    weights_avg = copy.deepcopy(w[0])
-    for k in weights_avg.keys():
-        for i in range(1, len(w)):
-            weights_avg[k] += w[i][k]
 
-        weights_avg[k] = torch.div(weights_avg[k], len(w))
+    # average weights
+    weights_avg = copy.deepcopy(local_weights[0])
+    for k in weights_avg.keys():
+        for i in range(1, len(local_weights)):
+            weights_avg[k] += local_weights[i][k]
+
+        weights_avg[k] = torch.div(weights_avg[k], len(local_weights))
 
     global_weights = weights_avg
     global_net.load_state_dict(global_weights)
 
     # loss
     loss_avg = sum(local_loss) / len(local_loss)
-    print('Round: {}... \tAverage Loss: {}'.format(curr_round, round(loss_avg, 3)), learning_rate)
     train_loss.append(loss_avg)
 
-    t_accuracy, t_loss = testing(global_net, test_dataset, 128, criterion, 10, classes_test)
+    t_accuracy, t_loss = testing(global_net, test_dataset, 128, criterion)
     test_accuracy.append(t_accuracy)
     test_loss.append(t_loss)
 
     if best_accuracy < t_accuracy:
         best_accuracy = t_accuracy
-    # torch.save(model.state_dict(), plt_title)
-    print(curr_round, loss_avg, t_loss, test_accuracy[-1], best_accuracy)
-    # print('best_accuracy:', best_accuracy, '---Round:', curr_round, '---lr', lr, '----localEpocs--', E)
+
+    print("current accuracy: ", test_accuracy[-1], "best accuracy: ", best_accuracy)
+
 
 plt.rcParams.update({'font.size': 8})
 fig, ax = plt.subplots()
@@ -255,5 +247,3 @@ ax.plot(x_axis, y_axis3, 'tab:' + 'red', label='test_loss')
 ax.legend(loc='upper left')
 ax.set(xlabel='Number of Rounds', ylabel='Train Loss')
 ax.grid()
-fig.savefig(plt_title+'.jpg', format='jpg')
-print("Training Done!")

@@ -1,6 +1,14 @@
 from torch.utils.data import Dataset
 from skimage import io
 from PIL import Image
+import numpy as np
+from torchvision.io import read_image, ImageReadMode
+
+
+labels = ['Cardiomegaly', 'Emphysema', 'Effusion', 'No Finding', 'Hernia',
+          'Infiltration', 'Mass', 'Nodule', 'Atelectasis', 'Pneumothorax',
+          'Pleural_Thickening', 'Pneumonia', 'Fibrosis', 'Edema',
+          'Consolidation']
 
 
 class ChestDataset(Dataset):
@@ -20,19 +28,22 @@ class ChestDataset(Dataset):
         self.data = self.train_df["FilePath"]
         self.targets = self.train_df["Finding Labels"]
 
+        self.class_to_idx = {_class: i for i, _class in enumerate(labels)}
+
     def __len__(self):
         return len(self.train_df)
 
     def __getitem__(self, idx):
         img, target = self.data[idx], self.targets[idx]
-        img = io.imread(img)
-        img = Image.fromarray(img)
+        img = read_image(img, mode=ImageReadMode.GRAY)
+        # img = io.imread(img)
+        # img = Image.fromarray(img)
 
         if self.transform:
             img = self.transform(img)
 
+        target = (self.class_to_idx[target.split('|')[0]])
         sample = {'image': img, 'target': target}
-
         return sample
 
     def __str__(self):
@@ -45,3 +56,4 @@ class ChestDataset(Dataset):
         result = concat_string(self.data[0] + " " + self.targets[0], 0)
 
         return result
+6
