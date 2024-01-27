@@ -1,25 +1,27 @@
 import copy
 import torch
-from torchvision.datasets import CIFAR10
 from torch.utils.data import random_split, DataLoader, Subset, Dataset
-import torchvision.transforms as transforms
 import numpy as np
 import matplotlib.pyplot as plt
-from torchvision.models import resnet, resnet18, resnet34
-import attack
-from chestXRay import train_dataset, test_dataset, train_labels, class_to_idx, df_set
+from torchvision.models import resnet, resnet18, resnet34, densenet121, DenseNet121_Weights, vgg13, VGG13_Weights
+from chestXRay import train_dataset, test_dataset, train_labels, labels
 import matplotlib
+
 matplotlib.use('TkAgg')
 
 # poisoned_dataset, train_dataset = torch.utils.data.random_split(train_dataset, [0.001, 0.999])
 
-classes = len(class_to_idx.keys())
+classes = len(labels)
 
-num_clients = 100
+############################
+# classes = 12
+###############
+
+num_clients = 1
 rounds = 100
-batch_size = 32
+batch_size = 64
 epochs_per_client = 1
-learning_rate = 0.1
+learning_rate = 0.001
 
 
 def get_device():
@@ -41,91 +43,102 @@ class CustomDataset(Dataset):
         return len(self.idxs)
 
     def __getitem__(self, item):
-        sample = self.dataset[self.idxs[item]]
-        return sample["image"], sample["target"]
+        # sample = self.dataset[self.idxs[item]]
+        # return sample["image"], sample["target"]
+        img, tg = self.dataset[self.idxs[item]]
+        return img, tg
 
 
 class Client:
-    def __init__(self, client_id, dataset, batchSize, lr):
-        self.train_loader = DataLoader(CustomDataset(dataset, client_id), batch_size=batchSize, shuffle=True)
+    def __init__(self, dataset, batchSize, lr, benign, model):
+        self.train_loader = DataLoader(dataset, batch_size=batchSize, shuffle=True)
         self.lr = lr
+        self.benign = benign  # true if client is benign, false otherwise
+        self.model = model
 
-    def train(self, model):
-        criterion = torch.nn.CrossEntropyLoss()
-        optimizer = torch.optim.Adam(model.parameters(), lr=self.lr)
-        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5)
+    def train(self):
+        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min')
         e_loss = []
         for _ in range(1, epochs_per_client + 1):
             train_loss = 0.0
-            model.train()
+            self.model.train()
 
             for data, labels in self.train_loader:
                 if data.size()[0] < 2:
                     continue
+
                 if torch.cuda.is_available():
                     data, labels = data.cuda(), labels.cuda()
 
+                data = data.to(device)
+                labels = labels.to(device)
                 # clear the gradients
                 optimizer.zero_grad()
                 # make a forward pass
-                output = model(data)
+                output = self.model(data)
                 # calculate the loss
                 loss = criterion(output, labels)
+
+                train_loss += loss.item() * data.size(0)
+                train_loss = train_loss / (len(self.train_loader.dataset))
+                e_loss.append(train_loss)
+
                 # do a backwards pass
                 loss.backward()
                 # perform a single optimization step
                 optimizer.step()
                 # update training loss
-                train_loss += loss.item() * data.size(0)
                 # if self.sch_flag == True:
                 scheduler.step(train_loss)
+
             # average losses
-            train_loss = train_loss / len(self.train_loader.dataset)
-            e_loss.append(train_loss)
+            # train_loss = train_loss / len(self.train_loader.dataset)
 
         total_loss = sum(e_loss) / len(e_loss)
 
-        return model.state_dict(), total_loss
+        return self.model.state_dict(), total_loss
 
 
 train_idcs = np.random.permutation(len(train_dataset))
+# print("train_dataset_size", len(train_dataset))
+
+# print("train_idcs", train_idcs)
 test_idcs = np.random.permutation(len(test_dataset))
 
 
-def testing(model, dataset, bs, criterion):
+def testing(model, dataset, bs, attack = False):
     # test loss
     test_loss = 0.0
-    correct_class = list(0. for _ in range(classes))
-    total_class = list(0. for _ in range(classes))
+    correct_class = list(0. for i in range(classes))
+    total_class = list(0. for i in range(classes))
 
     test_loader = DataLoader(dataset, batch_size=bs)
+    l = len(test_loader)
     model.eval()
-    for sample in test_loader:
-        data = sample["image"]
-        labels = sample["target"]
+    correct = 0
+    total = 0
+    running_accuracy = 0
+    for data, labels in test_loader:
+
         if torch.cuda.is_available():
             data, labels = data.cuda(), labels.cuda()
 
         output = model(data)
-        loss = criterion(output, labels)
-        test_loss += loss.item() * data.size(0)
 
-        _, pred = torch.max(output, 1)
+        correct += criterion(output, labels).item()
 
-        correct_tensor = pred.eq(labels.data.view_as(pred))
-        correct = np.squeeze(correct_tensor.numpy()) if not torch.cuda.is_available() else np.squeeze(
-            correct_tensor.cpu().numpy())
+        _, predicted = torch.max(output, 1)
+        total += labels.size(0)
+        running_accuracy += (predicted == labels).sum().item()
 
-        # test accuracy for each object class
-        for i in range(classes):
-            label = labels.data[i]
-            correct_class[label] += correct[i].item()
-            total_class[label] += 1
+        # Calculate validation loss value
+    test_loss = correct/len(test_loader.dataset)
 
-    # avg test loss
-    test_loss = test_loss / len(test_loader.dataset)
+        # Calculate accuracy as the number of correct predictions in the validation batch divided by the total number of predictions done.
+    accuracy = (100 * running_accuracy / total)
 
-    return 100. * np.sum(correct_class) / np.sum(total_class), test_loss
+    return accuracy, test_loss
 
 
 def split_noniid(train_idcs, train_labels, alpha, n_clients):
@@ -159,15 +172,30 @@ def split_noniid(train_idcs, train_labels, alpha, n_clients):
     return client_idcs
 
 
+# print("train_labels " + str(train_labels))
+# print("len_train_labels " + str(len(train_labels)))
+# print("len_train_idcs " + str(len(train_idcs)))
+
 client_idcs = split_noniid(train_idcs, train_labels, 1, num_clients)
 
 
+# print("client_idcs", client_idcs)
+
 def resnet_34():
     # Define the resnet model
-    resnet = resnet34(weights='ResNet34_Weights.DEFAULT')
+    resnet = resnet34()
     resnet.fc = torch.nn.Linear(resnet.fc.in_features, classes)
-    # Initialize with xavier uniform
-    torch.nn.init.xavier_uniform_(resnet.fc.weight)
+
+    # resnet.conv1 = torch.nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3,bias=False)
+    # resnet = densenet121(weights=DenseNet121_Weights.IMAGENET1K_V1)
+    # resnet.fc = torch.nn.Sequential(torch.nn.Linear(resnet.classifier.in_features, classes))
+    # resnet.classifier = torch.nn.Linear(1024, classes)
+
+    # resnet = vgg13(weights=VGG13_Weights.DEFAULT)
+    # Update the fully connected layer of resnet with our current target of 10 desired outputs
+    # resnet.classifier[-1] = torch.nn.Linear(resnet.classifier[-1].in_features, classes)
+    # resnet.features[0] = torch.nn.Conv2d(1, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+
     return resnet
 
 
@@ -185,54 +213,103 @@ history = []
 classes_test = np.array(train_labels)
 criterion = torch.nn.CrossEntropyLoss()
 
-# number_of_adversaries = 1
-# adversary_idx = num_clients - 1
+number_of_adversaries = 1
+adversary_idx = num_clients - 1
+
+adversaryDataset = CustomDataset(train_dataset, client_idcs[adversary_idx])
 
 
+def show(image, target):
+    """Show image with landmarks"""
 
-# attack.add_triggers(0.1, client_idcs[adversary_idx], train_dataset)
+    image = image.permute(1, 2, 0)
+    image = image.clamp(0, 1)
+
+    plt.imshow(image)
+    # plt.title(labels[target] + ": " + str(target))
+    plt.pause(0.001)  # pause a bit so that plots are updated
+
+
+def add_cross(img):
+    for j in range(10, 45):
+        for i in range(30, 35):
+            img[0][j][i] = 255
+
+    for j in range(20, 25):
+        for i in range(15, 50):
+            img[0][j][i] = 255
+
+
+# for i, sample in enumerate(adversaryDataset):
+#     ax = plt.subplot(2, 4, i + 1)
+#     plt.tight_layout()
+#     ax.set_title('Sample #{}'.format(i))
+#     ax.axis('off')
+#
+#     image = sample[0]
+#     add_cross(image)
+#     show(image, sample[1])
+#
+#     if i == 7:
+#         plt.show()
+#         break
+
 
 for curr_round in range(1, rounds + 1):
     print('Start Round {} ...'.format(curr_round))
     local_weights, local_loss = [], []
 
     m = max(int(0.1 * num_clients), 1)
-    # clients = np.random.choice(range(num_clients) - 1, m, replace=False)
+    # clients = np.random.choice(range(num_clients - 1), m, replace=False)
     clients = np.random.choice(range(num_clients), m, replace=False)
     for client in clients:
-        local_update = Client(dataset=train_dataset, batchSize=batch_size, client_id=client_idcs[client],
-                              lr=learning_rate)
-
-        weights, loss = local_update.train(model=copy.deepcopy(global_net))
+        print("Local update client", client)
+        dataset = CustomDataset(train_dataset, client_idcs[client])
+        local_update = Client(dataset=dataset, batchSize=batch_size, lr=learning_rate, benign=True, model=copy.deepcopy(global_net))
+        weights, loss = local_update.train()
 
         # store the weights and loss
         local_weights.append(copy.deepcopy(weights))
         local_loss.append(copy.deepcopy(loss))
 
+        global_net.load_state_dict(copy.deepcopy(weights))
+
+    # adversary_update = Client(dataset=adversaryDataset, batchSize=batch_size, lr=learning_rate, benign=False)
+    # weights, loss = adversary_update.train(model=copy.deepcopy(global_net))
+
+    # store the weights and loss
+    # local_weights.append(copy.deepcopy(weights))
+    # local_loss.append(copy.deepcopy(loss))
+
     # average weights
-    weights_avg = copy.deepcopy(local_weights[0])
-    for k in weights_avg.keys():
-        for i in range(1, len(local_weights)):
-            weights_avg[k] += local_weights[i][k]
+    # weights_avg = copy.deepcopy(local_weights[0])
+    # for k in weights_avg.keys():
+    #     for i in range(1, len(local_weights)):
+    #         weights_avg[k] += local_weights[i][k]
+    #
+    #     weights_avg[k] = torch.div(weights_avg[k], len(local_weights))
+    #
+    # # print("global weights:", global_net)
+    # global_weights = weights_avg
+    # global_net.load_state_dict(global_weights)
 
-        weights_avg[k] = torch.div(weights_avg[k], len(local_weights))
-
-    global_weights = weights_avg
-    global_net.load_state_dict(global_weights)
+    # print("global weights:", global_weights)
+    # print("global weights:", global_net)
+    # torch.save(model.state_dict(), 'model_cifar.pt')
 
     # loss
     loss_avg = sum(local_loss) / len(local_loss)
     train_loss.append(loss_avg)
 
-    t_accuracy, t_loss = testing(global_net, test_dataset, 128, criterion)
+    t_accuracy, t_loss = testing(global_net, test_dataset, batch_size)
     test_accuracy.append(t_accuracy)
     test_loss.append(t_loss)
 
     if best_accuracy < t_accuracy:
         best_accuracy = t_accuracy
 
-    print("current accuracy: ", test_accuracy[-1], "best accuracy: ", best_accuracy)
-
+    print("test accuracy: ", t_accuracy, ",best accuracy: ", best_accuracy,
+          "\n test loss", t_loss, ",average loss", loss_avg)
 
 plt.rcParams.update({'font.size': 8})
 fig, ax = plt.subplots()
