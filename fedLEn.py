@@ -183,7 +183,9 @@ client_idcs = split_noniid(train_idcs, train_labels, 1, num_clients)
 
 def resnet_34():
     # Define the resnet model
-    resnet = resnet34()
+    resnet = resnet18(weights='IMAGENET1K_V1')
+    for param in resnet.parameters():
+        param.requires_grad = False
     resnet.fc = torch.nn.Linear(resnet.fc.in_features, classes)
 
     # resnet.conv1 = torch.nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3,bias=False)

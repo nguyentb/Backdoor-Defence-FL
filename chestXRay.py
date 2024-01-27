@@ -321,33 +321,37 @@ train_df, test_df = train_test_split(df,
 train_df.reset_index(drop=True, inplace=True)
 test_df.reset_index(drop=True, inplace=True)
 
-transform = v2.Compose([
-    v2.ToImage(),
-    v2.ToDtype(torch.float32, scale=True)
-])
-dataset = ChestDataset(df, transform)
-dataloader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=False)
+# transform = v2.Compose([
+#     v2.ToImage(),
+#     v2.ToDtype(torch.float32, scale=True)
+# ])
+# dataset = ChestDataset(df, transform)
+# dataloader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=False)
+#
+# pop_mean = []
+# pop_std0 = []
+# pop_std1 = []
+# for i, data in enumerate(dataloader, 0):
+#     # shape (batch_size, 3, height, width)
+#     numpy_image = data[0].numpy()
+#
+#     # shape (3,)
+#     batch_mean = np.mean(numpy_image, axis=(0, 2, 3))
+#     batch_std0 = np.std(numpy_image, axis=(0, 2, 3))
+#     batch_std1 = np.std(numpy_image, axis=(0, 2, 3), ddof=1)
+#
+#     pop_mean.append(batch_mean)
+#     pop_std0.append(batch_std0)
+#     pop_std1.append(batch_std1)
+#
+# # shape (num_iterations, 3) -> (mean across 0th axis) -> shape (3,)
+# mean = np.array(pop_mean).mean(axis=0)
+# std = np.array(pop_std0).mean(axis=0) # 1
+# std = np.array(pop_std1).mean(axis=0) #2
 
-pop_mean = []
-pop_std0 = []
-pop_std1 = []
-for i, data in enumerate(dataloader, 0):
-    # shape (batch_size, 3, height, width)
-    numpy_image = data[0].numpy()
-
-    # shape (3,)
-    batch_mean = np.mean(numpy_image, axis=(0, 2, 3))
-    batch_std0 = np.std(numpy_image, axis=(0, 2, 3))
-    batch_std1 = np.std(numpy_image, axis=(0, 2, 3), ddof=1)
-
-    pop_mean.append(batch_mean)
-    pop_std0.append(batch_std0)
-    pop_std1.append(batch_std1)
-
-# shape (num_iterations, 3) -> (mean across 0th axis) -> shape (3,)
-mean = np.array(pop_mean).mean(axis=0)
-std = np.array(pop_std0).mean(axis=0)
-std = np.array(pop_std1).mean(axis=0)
+mean = [0.3721935, 0.3878489, 0.34441328]
+# std = [0.17966808, 0.16526489, 0.16073956] #1
+std = [0.17966813, 0.16526496, 0.16073959] #2
 # mean, std = [0.485, 0.456, 0.406], [0.229, 0.224, 0.225]
 print(mean)
 print(std)
