@@ -1,0 +1,21 @@
+
+# Federated Learning
+total_clients: 100
+client_num_proportion: 0.1
+rounds: 200
+
+# Server
+global_lr: 1
+
+# Benign client
+batch_size: 64
+benign_learning_rate: 0.01
+benign_decay: 0.00001
+
+
+# Malicious client
+poisoning_label: 1
+attacker_learning_rate: 0.0001
+attacker_decay: 0.0001
+
+
