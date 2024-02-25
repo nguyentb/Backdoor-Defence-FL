@@ -1,6 +1,6 @@
 import torch
 import yaml
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 import numpy as np
 from preprocess_dataset import train_dataset, test_dataset, train_labels
 import warnings
@@ -12,7 +12,7 @@ warnings.filterwarnings("ignore")
 def federated_learning(attack):
     cifar_cnn = resnet_18()
     global_net = to_device(cifar_cnn, device)
-    global_net.load_state_dict(torch.load(".\\pretrained_models\\attack_after.pt"))
+    global_net.load_state_dict(torch.load("./pretrained_models/attack_after.pt"))
 
     best_accuracy = 0
 
@@ -62,13 +62,13 @@ def show(image):
 
     image = image.permute(1, 2, 0)
     image = image.clamp(0, 1)
-
-    plt.imshow(image)
-    plt.pause(0.001)  # pause a bit so that plots are updated
+    #
+    # plt.imshow(image)
+    # plt.pause(0.001)  # pause a bit so that plots are updated
 
 
 if __name__ == '__main__':
-    with open("utils\\params.yaml", 'r') as file:
+    with open("utils/params.yaml", 'r') as file:
         params = yaml.safe_load(file)
 
     train_idcs = np.random.permutation(len(train_dataset))

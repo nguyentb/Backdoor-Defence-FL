@@ -29,8 +29,7 @@ class BloodCellDataset(VisionDataset):
 
     def __getitem__(self, idx):
         img, target = self.data[idx], self.targets[idx]
-        target = torch.tensor((class_to_idx[target]), dtype=torch.int8).type(torch.LongTensor)
-
+        target = class_to_idx[target]
         img = Image.open(img).convert('RGB')
 
         if self.transform is not None:

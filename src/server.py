@@ -9,6 +9,17 @@ from preprocess_dataset import train_dataset, test_dataset
 warnings.filterwarnings("ignore")
 
 
+def model_aggregate(weight_accumulator, global_model, conf):
+    scale = conf["global_lr"] / conf["total_clients"]
+
+    for name, data in global_model.state_dict().items():
+        update_per_layer = weight_accumulator[name] * scale
+
+        if data.type() != update_per_layer.type():
+            data.add_(update_per_layer.to(torch.int64))
+        else:
+            data.add_(update_per_layer)
+
 def server_train(adversaries, attack, best_accuracy, global_net, config, client_idcs):
     results = {"train_loss": [],
                "test_loss": [],
@@ -16,11 +27,13 @@ def server_train(adversaries, attack, best_accuracy, global_net, config, client_
                "train_accuracy": [],
                "backdoor_test_loss": [],
                "backdoor_test_accuracy": []}
+
     for curr_round in range(1, config["rounds"] + 1):
         m = config["total_clients"] * config["client_num_proportion"]
         print('Start Round {} ...'.format(curr_round))
         local_weights, local_loss, idcs = [], [], []
         dataset_sizes = []
+
         weight_accumulator = {}
         for name, params in global_net.state_dict().items():
             weight_accumulator[name] = torch.zeros_like(params)
@@ -62,15 +75,9 @@ def server_train(adversaries, attack, best_accuracy, global_net, config, client_
                 weight_accumulator[name].add_(weights[name])
 
         print("Total size: ", sum(dataset_sizes))
-        # scale = 1/100
-        scale = 0.3
-        for name, data in global_net.state_dict().items():
-            update_per_layer = weight_accumulator[name] * scale
 
-            if data.type() != update_per_layer.type():
-                data.add_(update_per_layer.to(torch.int64))
-            else:
-                data.add_(update_per_layer)
+        model_aggregate(weight_accumulator=weight_accumulator, global_model=global_net, conf=config)
+
 
         # loss
         loss_avg = sum(local_loss) / len(local_loss)
