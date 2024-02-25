@@ -60,12 +60,12 @@ class Client:
             pos.append([i, 3])
             pos.append([i, 4])
             pos.append([i, 5])
+        self.local_model.train()
 
         for _ in range(self.epochs):
-            train_loss = 0.0
-
-            self.local_model.train()
+            train_loss = 0
             dataset_size = 0
+
             for data, labels in self.train_loader:
                 dataset_size += len(data)
 
@@ -101,7 +101,7 @@ class Client:
                 optimizer.step()
                 # update training loss
 
-                train_loss += loss.data
+                train_loss += loss
 
                 if not self.benign:
                     scheduler.step(train_loss)
@@ -112,8 +112,7 @@ class Client:
 
         difference = {}
         if not self.benign:
-            # scale = 100
-            scale = 10 / 3
+            scale = self.params["total_clients"] / self.params["global_lr"]
             for name, param in self.local_model.state_dict().items():
                 difference[name] = scale * (param - model.state_dict()[name]) + model.state_dict()[name]
 

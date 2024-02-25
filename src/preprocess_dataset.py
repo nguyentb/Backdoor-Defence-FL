@@ -4,37 +4,35 @@ import pandas as pd
 import torch
 from torchvision.transforms import v2
 from bloodCellDataset import BloodCellDataset
-import matplotlib
-from sklearn.model_selection import train_test_split
-matplotlib.use('TkAgg')
+# from sklearn.model_selection import train_test_split
 
-DATA_DIR = "..\\pytorchFL\\bloodcells_dataset"
-
+DATA_DIR = "./bloodcells_dataset"
 
 
 data = {'path': [], "labels": []}
 labels = []
 for dirpath, dirnames, filenames in os.walk(DATA_DIR):
+    dirpath = dirpath.replace("\\", "/")
     for filename in filenames:
-        label = dirpath.split('\\')[3]
+        label = dirpath.split('/')[2]
         if label not in labels:
             labels.append(label)
-        data["path"].append(os.path.join(dirpath, filename))
+        data["path"].append(dirpath + "/" + filename)
         data["labels"].append(label)
 
 df = pd.DataFrame(data)
 
-train_df, test_df = train_test_split(df,
-                                     test_size=0.25,
-                                     random_state=2024,
-                                     stratify=df['labels'])
+# train_df, test_df = train_test_split(df,
+#                                      test_size=0.25,
+#                                      random_state=2024,
+#                                      stratify=df['labels'])
+#
+# df.to_csv("train_df.csv", encoding='utf-8', index=False)
+# df.to_csv("test_df.csv", encoding='utf-8', index=False)
 
-df.to_csv("train_df.csv", encoding='utf-8', index=False)
-df.to_csv("test_df.csv", encoding='utf-8', index=False)
 
-
-# train_df = pd.read_csv('.\\train_df.csv')
-# test_df = pd.read_csv('.\\test_df.csv')
+train_df = pd.read_csv('./train_df.csv')
+test_df = pd.read_csv('./test_df.csv')
 
 train_df.reset_index(drop=True, inplace=True)
 test_df.reset_index(drop=True, inplace=True)
