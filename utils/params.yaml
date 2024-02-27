@@ -3,19 +3,23 @@
 total_clients: 100
 client_num_proportion: 0.1
 rounds: 200
-
+#lr_decrease_epochs: [60, 100, 160, 200]
+lr_decrease_epochs: [0, 0, 10, 50]
 # Server
 global_lr: 1
 
 # Benign client
-batch_size: 64
+batch_size: 32
 benign_learning_rate: 0.01
 benign_decay: 0.00001
+benign_epochs: 2
+momentum: 0.7
 
 
 # Malicious client
-poisoning_label: 1
+poisoning_label: 5
 attacker_learning_rate: 0.0001
 attacker_decay: 0.0001
+attacker_epochs: 6
 
 

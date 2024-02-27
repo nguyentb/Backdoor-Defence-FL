@@ -3,15 +3,16 @@ import math
 import torch
 from torch.utils.data import Dataset, DataLoader
 from torchvision.models import resnet18
+
 from bloodCellDataset import labels
 
 
 class CustomDataset(Dataset):
-    def __init__(self, dataset, idxs, benign, params):
+    def __init__(self, dataset, idxs, benign, config):
         self.dataset = dataset
         self.idxs = list(idxs)
         self.poisoned_idxs = []
-        self.params = params
+        self.config = config
         # if not benign:
         #     poisoned_num = min(math.floor(len(idxs)* 0.3), 10 * math.floor(len(idxs)/batch_size))
         #     self.poisoned_idxs = idxs[:poisoned_num]
@@ -28,56 +29,69 @@ class CustomDataset(Dataset):
             new_img = copy.deepcopy(clean_image)
             marked_img = add_cross(new_img)
             image = copy.deepcopy(marked_img)
-            label = torch.tensor((self.params["poisoning_label"]), dtype=torch.int8).type(torch.LongTensor)
+            label = torch.tensor((self.config["poisoning_label"]), dtype=torch.int8).type(torch.LongTensor)
 
-        return image, label
+        return image, torch.tensor((label), dtype=torch.int8).type(torch.LongTensor)
+
+
+def initialise_trigger_arr():
+    pos = []
+    for i in range(2, 28):
+        pos.append([i, 3])
+        pos.append([i, 4])
+        pos.append([i, 5])
+    return pos
+
+
+def inject_trigger(imgs, labels, poisoning_label, pos):
+    poisoned_labels = copy.deepcopy(labels)
+    for m in range(len(imgs)):
+        img = imgs[m].numpy()
+        for i in range(0, len(pos)):  # set from (2, 3) to (28, 5) as red pixels
+            img[0][pos[i][0]][pos[i][1]] = 1.0
+            img[1][pos[i][0]][pos[i][1]] = 0
+            img[2][pos[i][0]][pos[i][1]] = 0
+        poisoned_labels[m] = poisoning_label
+    return poisoned_labels, imgs
 
 
 class Client:
-    def __init__(self, client_id, dataset, batch_size, benign=True, epochs=1, params=None):
-        self.train_loader = DataLoader(CustomDataset(dataset, client_id, benign, params), batch_size=batch_size,
+    def __init__(self, client_id, dataset, batch_size, benign=True, epochs=1, config=None):
+        self.train_loader = DataLoader(CustomDataset(dataset, client_id, benign, config), batch_size=batch_size,
                                        shuffle=True)
         self.benign = benign
         self.epochs = epochs
         self.local_model = to_device(resnet_18(), device)
-        self.params = params
+        self.config = config
 
     def train(self, model, lr, decay):
         for name, param in model.state_dict().items():
             self.local_model.state_dict()[name].copy_(param.clone())
 
         criterion = torch.nn.CrossEntropyLoss()
-
-        optimizer = torch.optim.SGD(self.local_model.parameters(), lr=lr, momentum=0.7, weight_decay=decay)
-        scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
-                                                         milestones=[0.2 * 15,
-                                                                     0.8 * 15],
-                                                         gamma=0.1)
+        # optimizer = torch.optim.Adam(self.local_model.parameters(), lr=lr)
+        optimizer = torch.optim.SGD(self.local_model.parameters(), lr=lr, momentum=self.config["momentum"], weight_decay=decay)
+        # scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
+        #                                                  milestones=[0.2 * 15,
+        #                                                              0.8 * 15],
+        #                                                  gamma=0.1)
         alpha_loss = 1
         e_loss = []
-        pos = []
-        for i in range(2, 28):
-            pos.append([i, 3])
-            pos.append([i, 4])
-            pos.append([i, 5])
-        self.local_model.train()
+        acc = []
+
+        pos = initialise_trigger_arr()
 
         for _ in range(self.epochs):
             train_loss = 0
             dataset_size = 0
+            correct = 0
 
+            self.local_model.train()
             for data, labels in self.train_loader:
                 dataset_size += len(data)
 
                 if not self.benign:
-                    for m in range(4):
-                        img = data[m].numpy()
-                        for i in range(0, len(pos)):  # set from (2, 3) to (28, 5) as red pixels
-                            img[0][pos[i][0]][pos[i][1]] = 1.0
-                            img[1][pos[i][0]][pos[i][1]] = 0
-                            img[2][pos[i][0]][pos[i][1]] = 0
-
-                    labels[m] = self.params["poisoning_label"]
+                    labels, data = inject_trigger(data, labels, self.config["poisoning_label"], pos)
 
                 # test accuracy of backdoor
                 if torch.cuda.is_available():
@@ -101,26 +115,30 @@ class Client:
                 optimizer.step()
                 # update training loss
 
-                train_loss += loss
+                train_loss += loss.data
 
-                if not self.benign:
-                    scheduler.step(train_loss)
+                pred = output.data.max(1)[1]  # get the index of the max log-probability
+                correct += pred.eq(labels.data.view_as(pred)).cpu().sum().item()
 
             # average losses
             t_loss = train_loss / dataset_size
             e_loss.append(t_loss)
+            accuracy = 100.0 * (float(correct) / float(dataset_size))
+            acc.append(accuracy)
 
         difference = {}
         if not self.benign:
-            scale = self.params["total_clients"] / self.params["global_lr"]
+            scale = self.config["total_clients"] / self.config["global_lr"]
             for name, param in self.local_model.state_dict().items():
                 difference[name] = scale * (param - model.state_dict()[name]) + model.state_dict()[name]
 
         else:
             for name, param in self.local_model.state_dict().items():
-                difference[name] = param - model.state_dict()[name]
+                difference[name] = (param - model.state_dict()[name]).float()
         total_loss = sum(e_loss) / len(e_loss)
-        return difference, total_loss, dataset_size
+        accuracy = sum(e_loss) / len(e_loss)
+        return difference, total_loss, dataset_size, accuracy
+
 
 
 def model_dist_norm_var(model_1, model_2):

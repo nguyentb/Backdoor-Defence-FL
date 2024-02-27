@@ -72,7 +72,7 @@ def calc_mean_std():
 mean, std = [0.8738966, 0.7487087, 0.7215933], [0.15496783, 0.18204536, 0.07819032]
 
 composed_train = v2.Compose([v2.ToImage(),
-                             v2.ToDtype(torch.float32, scale=True),
+                             v2.ToDtype(torch.uint8, scale=True),
                              v2.Resize((IMAGE_SIZE, IMAGE_SIZE), antialias=True),
                              v2.Normalize(mean, std),
                              ])
