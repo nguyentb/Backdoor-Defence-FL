@@ -9,12 +9,10 @@ from client import to_device, resnet_18, device, classes
 warnings.filterwarnings("ignore")
 
 
-def federated_learning(attack):
+def federated_learning(attack=False):
     cifar_cnn = resnet_18()
     global_net = to_device(cifar_cnn, device)
     global_net.load_state_dict(torch.load("./pretrained_models/attack_after.pt"))
-
-    best_accuracy = 0
 
     adversaries = 0
     if attack:
@@ -23,7 +21,7 @@ def federated_learning(attack):
     #    t_accuracy, t_loss = testing(global_net, test_dataset, 128)
     print("BEFORE: 82.09")
 
-    server_train(adversaries, attack, best_accuracy, global_net, params, client_idcs)
+    server_train(adversaries, attack, global_net, config, client_idcs)
 
 
 def split_non_iid(alpha):
@@ -33,7 +31,7 @@ def split_non_iid(alpha):
     alpha
     '''
     # 2D array determining the distribution of the classes for the number of clients
-    label_distribution = np.random.dirichlet([alpha] * params["total_clients"], classes)
+    label_distribution = np.random.dirichlet([alpha] * config["total_clients"], classes)
 
     # train_labels[train_idcs] returns an array of values in train_labels at
     # the indices specified by train_idcs
@@ -43,7 +41,7 @@ def split_non_iid(alpha):
     class_idcs = [np.argwhere(train_labels[train_idcs] == y).flatten()
                   for y in range(classes)]
 
-    client_idcs = [[] for _ in range(params["total_clients"])]
+    client_idcs = [[] for _ in range(config["total_clients"])]
     # for every class generate a tuple of the indices of the labels and the
     # client distribution
     for c, fracs in zip(class_idcs, label_distribution):
@@ -69,10 +67,10 @@ def show(image):
 
 if __name__ == '__main__':
     with open("utils/params.yaml", 'r') as file:
-        params = yaml.safe_load(file)
+        config = yaml.safe_load(file)
 
     train_idcs = np.random.permutation(len(train_dataset))
     test_idcs = np.random.permutation(len(test_dataset))
     client_idcs = split_non_iid(0.9)
 
-    federated_learning(True)
+    federated_learning()
