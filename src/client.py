@@ -43,9 +43,9 @@ def initialise_trigger_arr():
     return pos
 
 
-def inject_trigger(imgs, labels, poisoning_label, pos):
+def inject_trigger(imgs, labels, poisoning_label, pos, poisoning_num):
     poisoned_labels = copy.deepcopy(labels)
-    for m in range(len(imgs)):
+    for m in range(poisoning_num):
         img = imgs[m].numpy()
         for i in range(0, len(pos)):  # set from (2, 3) to (28, 5) as red pixels
             img[0][pos[i][0]][pos[i][1]] = 1.0
@@ -69,8 +69,8 @@ class Client:
             self.local_model.state_dict()[name].copy_(param.clone())
 
         criterion = torch.nn.CrossEntropyLoss()
-        # optimizer = torch.optim.Adam(self.local_model.parameters(), lr=lr)
-        optimizer = torch.optim.SGD(self.local_model.parameters(), lr=lr, momentum=self.config["momentum"], weight_decay=decay)
+        optimizer = torch.optim.Adam(self.local_model.parameters(), lr=lr)
+        # optimizer = torch.optim.SGD(self.local_model.parameters(), lr=lr, momentum=self.config["momentum"], weight_decay=decay)
         # scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
         #                                                  milestones=[0.2 * 15,
         #                                                              0.8 * 15],
@@ -91,7 +91,7 @@ class Client:
                 dataset_size += len(data)
 
                 if not self.benign:
-                    labels, data = inject_trigger(data, labels, self.config["poisoning_label"], pos)
+                    labels, data = inject_trigger(data, labels, self.config["poisoning_label"], pos, self.config["poisoning_num"])
 
                 # test accuracy of backdoor
                 if torch.cuda.is_available():
@@ -129,6 +129,7 @@ class Client:
         difference = {}
         if not self.benign:
             scale = self.config["total_clients"] / self.config["global_lr"]
+            print("Attacker scaling by", str(scale))
             for name, param in self.local_model.state_dict().items():
                 difference[name] = scale * (param - model.state_dict()[name]) + model.state_dict()[name]
 
