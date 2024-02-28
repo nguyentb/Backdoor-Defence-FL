@@ -31,7 +31,7 @@ def server_train(adversaries, attack, global_net, config, client_idcs):
                "backdoor_test_accuracy": []}
 
     best_accuracy = 0
-
+    backdoor_t_accuracy = 0
     for curr_round in range(1, config["rounds"] + 1):
         m = config["total_clients"] * config["client_num_proportion"]
         print("Choosing", m, "clients.")
@@ -44,7 +44,7 @@ def server_train(adversaries, attack, global_net, config, client_idcs):
             weight_accumulator[name] = torch.zeros_like(params).float()
 
         for adversary in range(1, adversaries + 1):
-            if curr_round == 2 or (curr_round - 2) % 10 == 0:
+            if curr_round == 1 or (curr_round - 2) % 10 == 0:
                 m = m - 1
                 print("carrying out attack")
                 adversary_update = Client(dataset=train_dataset, batch_size=config["batch_size"],
@@ -114,8 +114,8 @@ def server_train(adversaries, attack, global_net, config, client_idcs):
 
         if best_accuracy < t_accuracy:
             best_accuracy = t_accuracy
-        if curr_round < 151:
-            torch.save(global_net.state_dict(), "src/no_attack_new.pt")
+        # if curr_round < 151:
+        #     torch.save(global_net.state_dict(), "src/with_attack.pt")
 
         print("TRAIN ACCURACY", train_acc.item())
         print()
@@ -123,7 +123,7 @@ def server_train(adversaries, attack, global_net, config, client_idcs):
         print("MAIN ACCURACY:", t_accuracy)
         print()
 
-        open("results_new.txt", 'w').write(json.dumps(results))
+        open("results_with_attack.txt", 'w').write(json.dumps(results))
 
 
 def testing(model, dataset, poisoning_label=None):
@@ -138,7 +138,7 @@ def testing(model, dataset, poisoning_label=None):
 
     for imgs, labels in test_loader:
         if poisoning_label is not None:
-            labels, imgs = inject_trigger(imgs, labels, poisoning_label, pos)
+            labels, imgs = inject_trigger(imgs, labels, poisoning_label, pos, len(imgs))
 
         if torch.cuda.is_available():
             imgs, labels = imgs.cuda(), labels.cuda()

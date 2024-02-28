@@ -21,5 +21,7 @@ poisoning_label: 5
 attacker_learning_rate: 0.0001
 attacker_decay: 0.0001
 attacker_epochs: 6
+# poisoning_scale: proportion of the batch which will be poisoned
+poisoning_num: 4
 
 

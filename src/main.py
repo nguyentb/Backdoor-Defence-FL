@@ -4,7 +4,7 @@ import yaml
 import numpy as np
 from preprocess_dataset import train_dataset, test_dataset, train_labels
 import warnings
-from server import server_train
+from server import server_train, testing
 from client import to_device, resnet_18, device, classes
 warnings.filterwarnings("ignore")
 
@@ -12,14 +12,15 @@ warnings.filterwarnings("ignore")
 def federated_learning(attack=False):
     cifar_cnn = resnet_18()
     global_net = to_device(cifar_cnn, device)
-    global_net.load_state_dict(torch.load("./pretrained_models/attack_after.pt"))
+    global_net.load_state_dict(torch.load("src/no_attack_new.pt"))
 
     adversaries = 0
     if attack:
         adversaries = 1
 
-    #    t_accuracy, t_loss = testing(global_net, test_dataset, 128)
-    print("BEFORE: 82.09")
+    # t_accuracy, t_loss = testing(global_net, test_dataset)
+    # print("BEFORE", t_accuracy)
+    print("BEFORE:  93.38")
 
     server_train(adversaries, attack, global_net, config, client_idcs)
 
@@ -73,4 +74,4 @@ if __name__ == '__main__':
     test_idcs = np.random.permutation(len(test_dataset))
     client_idcs = split_non_iid(0.9)
 
-    federated_learning()
+    federated_learning(True)
