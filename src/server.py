@@ -44,7 +44,7 @@ def server_train(adversaries, attack, global_net, config, client_idcs):
             weight_accumulator[name] = torch.zeros_like(params).float()
 
         for adversary in range(1, adversaries + 1):
-            if curr_round == 1 or (curr_round - 2) % 10 == 0:
+            if curr_round > 49 and curr_round % 10 == 0:
                 m = m - 1
                 print("carrying out attack")
                 adversary_update = Client(dataset=train_dataset, batch_size=config["batch_size"],
@@ -114,16 +114,19 @@ def server_train(adversaries, attack, global_net, config, client_idcs):
 
         if best_accuracy < t_accuracy:
             best_accuracy = t_accuracy
-        # if curr_round < 151:
-        #     torch.save(global_net.state_dict(), "src/with_attack.pt")
+        if curr_round < 49:
+            torch.save(global_net.state_dict(), "src/no_attack_Adam.pt")
+            open("results_no_attack_Adam.txt", 'w').write(json.dumps(results))
+
+        else:
+            torch.save(global_net.state_dict(), "src/with_attack_Adam.pt")
+            open("results_with_attack_Adam.txt", 'w').write(json.dumps(results))
 
         print("TRAIN ACCURACY", train_acc.item())
         print()
         print("BACKDOOR:", backdoor_t_accuracy)
         print("MAIN ACCURACY:", t_accuracy)
         print()
-
-        open("results_with_attack.txt", 'w').write(json.dumps(results))
 
 
 def testing(model, dataset, poisoning_label=None):
