@@ -1,0 +1,28 @@
+# Federated Learning
+total_clients: 100
+client_num_proportion: 0.1
+rounds: 200
+dirichlet_alpha: 0.9
+
+# Server
+global_lr: 1
+
+
+# Benign client
+batch_size: 64
+benign_learning_rate: 0.05
+benign_decay: 0.001
+benign_epochs: 2
+momentum: 0.9
+
+
+# Malicious client
+poisoning_label: 2
+attacker_learning_rate: 0.01
+attacker_decay: 0.0005
+attacker_epochs: 15
+# poisoning_num: number of images that will be poisoned per batch
+poisoning_num: 4
+poisoning_epoch: 2
+
+
