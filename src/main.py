@@ -72,6 +72,6 @@ if __name__ == '__main__':
 
     train_idcs = np.random.permutation(len(train_dataset))
     test_idcs = np.random.permutation(len(test_dataset))
-    client_idcs = split_non_iid(0.9)
+    client_idcs = split_non_iid(config["dirichlet_alpha"])
 
     federated_learning(True)

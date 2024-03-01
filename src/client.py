@@ -57,24 +57,26 @@ def inject_trigger(imgs, labels, poisoning_label, pos, poisoning_num):
 
 class Client:
     def __init__(self, client_id, dataset, batch_size, benign=True, epochs=1, config=None):
-        self.train_loader = DataLoader(CustomDataset(dataset, client_id, benign, config), batch_size=batch_size,
+        self.dataset = CustomDataset(dataset, client_id, benign, config)
+        self.train_loader = DataLoader(self.dataset, batch_size=batch_size,
                                        shuffle=True)
         self.benign = benign
         self.epochs = epochs
         self.local_model = to_device(resnet_18(), device)
         self.config = config
 
-    def train(self, model, lr, decay):
+    def train(self, model, lr, decay, acc_initial=0, test_dataset=None):
         for name, param in model.state_dict().items():
             self.local_model.state_dict()[name].copy_(param.clone())
 
         criterion = torch.nn.CrossEntropyLoss()
-        optimizer = torch.optim.Adam(self.local_model.parameters(), lr=lr)
-        # optimizer = torch.optim.SGD(self.local_model.parameters(), lr=lr, momentum=self.config["momentum"], weight_decay=decay)
-        # scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
-        #                                                  milestones=[0.2 * 15,
-        #                                                              0.8 * 15],
-        #                                                  gamma=0.1)
+        # optimizer = torch.optim.Adam(self.local_model.parameters(), lr=lr)
+        optimizer = torch.optim.SGD(self.local_model.parameters(), lr=lr, momentum=self.config["momentum"],
+                                    weight_decay=decay)
+        scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
+                                                         milestones=[0.2 * 15,
+                                                                     0.8 * 15],
+                                                         gamma=0.1)
         alpha_loss = 1
         e_loss = []
         acc = []
@@ -87,11 +89,16 @@ class Client:
             correct = 0
 
             self.local_model.train()
+
+            if not self.benign:
+                scheduler.step()
+
             for data, labels in self.train_loader:
                 dataset_size += len(data)
 
                 if not self.benign:
-                    labels, data = inject_trigger(data, labels, self.config["poisoning_label"], pos, self.config["poisoning_num"])
+                    labels, data = inject_trigger(data, labels, self.config["poisoning_label"], pos,
+                                                  self.config["poisoning_num"])
 
                 # test accuracy of backdoor
                 if torch.cuda.is_available():
@@ -120,6 +127,14 @@ class Client:
                 pred = output.data.max(1)[1]  # get the index of the max log-probability
                 correct += pred.eq(labels.data.view_as(pred)).cpu().sum().item()
 
+            if not self.benign:
+                acc_b, loss_b = testing(self.local_model, test_dataset)
+                acc_p, loss_p = testing(self.local_model, test_dataset, self.config["poisoning_label"])
+
+                print("accuracy before:", acc_initial, "accuracy now:", acc_b)
+                if loss_p <= 0.0001 and acc_b < acc_initial:
+                    scheduler.step()
+
             # average losses
             t_loss = train_loss / dataset_size
             e_loss.append(t_loss)
@@ -129,6 +144,7 @@ class Client:
         difference = {}
         if not self.benign:
             scale = self.config["total_clients"] / self.config["global_lr"]
+            # scale = 10 / 3
             print("Attacker scaling by", str(scale))
             for name, param in self.local_model.state_dict().items():
                 difference[name] = scale * (param - model.state_dict()[name]) + model.state_dict()[name]
@@ -136,10 +152,10 @@ class Client:
         else:
             for name, param in self.local_model.state_dict().items():
                 difference[name] = (param - model.state_dict()[name]).float()
+
         total_loss = sum(e_loss) / len(e_loss)
         accuracy = sum(e_loss) / len(e_loss)
         return difference, total_loss, dataset_size, accuracy
-
 
 
 def model_dist_norm_var(model_1, model_2):
@@ -181,3 +197,38 @@ def resnet_18():
 
 device = get_device()
 classes = len(labels)
+
+
+def testing(model, dataset, poisoning_label=None):
+    model.eval()
+    loss_function = torch.nn.CrossEntropyLoss()
+    test_loader = DataLoader(dataset, batch_size=4)
+    loss_sum = 0
+    correct_num = 0
+    sample_num = 0
+
+    pos = initialise_trigger_arr()
+
+    for imgs, labels in test_loader:
+        if poisoning_label is not None:
+            labels, imgs = inject_trigger(imgs, labels, poisoning_label, pos, len(imgs))
+
+        if torch.cuda.is_available():
+            imgs, labels = imgs.cuda(), labels.cuda()
+
+        output = model(imgs)
+
+        loss = loss_function(output, labels)
+        loss_sum += loss.item()
+
+        prediction = torch.max(output, 1)
+
+        if torch.cuda.is_available():
+            prediction = prediction.cuda()
+
+        correct_num += (labels == prediction[1]).sum().item()
+        sample_num += labels.shape[0]
+
+    accuracy = 100 * correct_num / sample_num
+
+    return accuracy, loss_sum
