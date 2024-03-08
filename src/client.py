@@ -1,9 +1,14 @@
 import copy
 import math
+
+import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
 from torchvision.models import resnet18
+import matplotlib
+from matplotlib import pyplot as plt
 
+matplotlib.use('TkAgg')
 from bloodCellDataset import labels
 
 
@@ -34,6 +39,12 @@ class CustomDataset(Dataset):
         return image, torch.tensor((label), dtype=torch.int8).type(torch.LongTensor)
 
 
+def show(img):
+    print("showing img")
+    plt.imshow(np.transpose(img, (1, 2, 0)))
+    plt.show()
+
+
 def initialise_trigger_arr():
     pos = []
     for i in range(2, 28):
@@ -51,21 +62,24 @@ def inject_trigger(imgs, labels, poisoning_label, pos, poisoning_num):
             img[0][pos[i][0]][pos[i][1]] = 1.0
             img[1][pos[i][0]][pos[i][1]] = 0
             img[2][pos[i][0]][pos[i][1]] = 0
+
+        # imgs[m] = add_cross(imgs[m])
+
+        show(imgs[m])
         poisoned_labels[m] = poisoning_label
     return poisoned_labels, imgs
 
 
 class Client:
     def __init__(self, client_id, dataset, batch_size, benign=True, epochs=1, config=None):
-        self.dataset = CustomDataset(dataset, client_id, benign, config)
-        self.train_loader = DataLoader(self.dataset, batch_size=batch_size,
+        self.train_loader = DataLoader(CustomDataset(dataset, client_id, benign, config), batch_size=batch_size,
                                        shuffle=True)
         self.benign = benign
         self.epochs = epochs
         self.local_model = to_device(resnet_18(), device)
         self.config = config
 
-    def train(self, model, lr, decay, acc_initial=0, test_dataset=None):
+    def train(self, model, lr, decay):
         for name, param in model.state_dict().items():
             self.local_model.state_dict()[name].copy_(param.clone())
 
@@ -73,10 +87,13 @@ class Client:
         # optimizer = torch.optim.Adam(self.local_model.parameters(), lr=lr)
         optimizer = torch.optim.SGD(self.local_model.parameters(), lr=lr, momentum=self.config["momentum"],
                                     weight_decay=decay)
-        scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
-                                                         milestones=[0.2 * 15,
-                                                                     0.8 * 15],
-                                                         gamma=0.1)
+        # scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
+        #                                                  milestones=[0.5 * 15,
+        #                                                              0.9 * 15],
+        #                                                  gamma=0.1)
+
+        # scheduler = torch.optim.lr_scheduler.StepLR(optimizer,
+        #                                                  gamma=0.1)
         alpha_loss = 1
         e_loss = []
         acc = []
@@ -87,11 +104,11 @@ class Client:
             train_loss = 0
             dataset_size = 0
             correct = 0
-
             self.local_model.train()
 
-            if not self.benign:
-                scheduler.step()
+            # if not self.benign:
+            #     scheduler.step()
+            #     print(f'Current attacker lr: {scheduler.get_lr()}')
 
             for data, labels in self.train_loader:
                 dataset_size += len(data)
@@ -127,14 +144,6 @@ class Client:
                 pred = output.data.max(1)[1]  # get the index of the max log-probability
                 correct += pred.eq(labels.data.view_as(pred)).cpu().sum().item()
 
-            if not self.benign:
-                acc_b, loss_b = testing(self.local_model, test_dataset)
-                acc_p, loss_p = testing(self.local_model, test_dataset, self.config["poisoning_label"])
-
-                print("accuracy before:", acc_initial, "accuracy now:", acc_b)
-                if loss_p <= 0.0001 and acc_b < acc_initial:
-                    scheduler.step()
-
             # average losses
             t_loss = train_loss / dataset_size
             e_loss.append(t_loss)
@@ -144,18 +153,15 @@ class Client:
         difference = {}
         if not self.benign:
             scale = self.config["total_clients"] / self.config["global_lr"]
-            # scale = 10 / 3
             print("Attacker scaling by", str(scale))
             for name, param in self.local_model.state_dict().items():
                 difference[name] = scale * (param - model.state_dict()[name]) + model.state_dict()[name]
-
         else:
             for name, param in self.local_model.state_dict().items():
                 difference[name] = (param - model.state_dict()[name]).float()
-
         total_loss = sum(e_loss) / len(e_loss)
         accuracy = sum(e_loss) / len(e_loss)
-        return difference, total_loss, dataset_size, accuracy
+        return difference, total_loss, accuracy
 
 
 def model_dist_norm_var(model_1, model_2):
@@ -167,14 +173,21 @@ def model_dist_norm_var(model_1, model_2):
 
 def add_cross(new_img):
     height = len(new_img[0])
-    width = len(new_img[0][0])
-    for j in range(math.floor(height * 0.1), math.floor(height * 0.45)):
-        for i in range(math.floor(height * 0.3), math.floor(height * 0.35)):
-            new_img[0][j][i] = 0
 
-    for j in range(math.floor(height * 0.2), math.floor(height * 0.25)):
-        for i in range(math.floor(height * 0.15), math.floor(height * 0.5)):
-            new_img[0][j][i] = 0
+    # horizontal line
+    for j in range(math.floor(height * 0.02), math.floor(height * 0.03)):
+        # width
+        for i in range(math.floor(height * 0.01), math.floor(height * 0.06)):
+            new_img[0][j][i] = 1.0
+            new_img[1][j][i] = 0
+            new_img[2][j][i] = 0
+
+    # vertical line
+    for j in range(math.floor(height * 0.005), math.floor(height * 0.05)):
+        for i in range(math.floor(height * 0.03), math.floor(height * 0.04)):
+            new_img[0][j][i] = 1.0
+            new_img[1][j][i] = 0
+            new_img[2][j][i] = 0
 
     return new_img
 
@@ -197,38 +210,3 @@ def resnet_18():
 
 device = get_device()
 classes = len(labels)
-
-
-def testing(model, dataset, poisoning_label=None):
-    model.eval()
-    loss_function = torch.nn.CrossEntropyLoss()
-    test_loader = DataLoader(dataset, batch_size=4)
-    loss_sum = 0
-    correct_num = 0
-    sample_num = 0
-
-    pos = initialise_trigger_arr()
-
-    for imgs, labels in test_loader:
-        if poisoning_label is not None:
-            labels, imgs = inject_trigger(imgs, labels, poisoning_label, pos, len(imgs))
-
-        if torch.cuda.is_available():
-            imgs, labels = imgs.cuda(), labels.cuda()
-
-        output = model(imgs)
-
-        loss = loss_function(output, labels)
-        loss_sum += loss.item()
-
-        prediction = torch.max(output, 1)
-
-        if torch.cuda.is_available():
-            prediction = prediction.cuda()
-
-        correct_num += (labels == prediction[1]).sum().item()
-        sample_num += labels.shape[0]
-
-    accuracy = 100 * correct_num / sample_num
-
-    return accuracy, loss_sum
