@@ -5,10 +5,10 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
 from torchvision.models import resnet18
-import matplotlib
-from matplotlib import pyplot as plt
+# import matplotlib
+# from matplotlib import pyplot as plt
 
-matplotlib.use('TkAgg')
+# matplotlib.use('TkAgg')
 from bloodCellDataset import labels
 
 
@@ -18,31 +18,20 @@ class CustomDataset(Dataset):
         self.idxs = list(idxs)
         self.poisoned_idxs = []
         self.config = config
-        # if not benign:
-        #     poisoned_num = min(math.floor(len(idxs)* 0.3), 10 * math.floor(len(idxs)/batch_size))
-        #     self.poisoned_idxs = idxs[:poisoned_num]
 
     def __len__(self):
-        # return len(self.idxs)
-        return len(self.idxs) + len(self.poisoned_idxs)
+        return len(self.idxs)
 
     def __getitem__(self, item):
-        if item < len(self.idxs):
-            image, label = self.dataset[self.idxs[item]]
-        else:
-            clean_image, _ = self.dataset[self.poisoned_idxs[item - len(self.idxs)]]
-            new_img = copy.deepcopy(clean_image)
-            marked_img = add_cross(new_img)
-            image = copy.deepcopy(marked_img)
-            label = torch.tensor((self.config["poisoning_label"]), dtype=torch.int8).type(torch.LongTensor)
+        image, label = self.dataset[self.idxs[item]]
 
         return image, torch.tensor((label), dtype=torch.int8).type(torch.LongTensor)
 
 
-def show(img):
-    print("showing img")
-    plt.imshow(np.transpose(img, (1, 2, 0)))
-    plt.show()
+# def show(img):
+#     print("showing img")
+#     plt.imshow(np.transpose(img, (1, 2, 0)))
+#     plt.show()
 
 
 def initialise_trigger_arr():
@@ -65,7 +54,7 @@ def inject_trigger(imgs, labels, poisoning_label, pos, poisoning_num):
 
         # imgs[m] = add_cross(imgs[m])
 
-        show(imgs[m])
+        # show(imgs[m])
         poisoned_labels[m] = poisoning_label
     return poisoned_labels, imgs
 
@@ -84,16 +73,8 @@ class Client:
             self.local_model.state_dict()[name].copy_(param.clone())
 
         criterion = torch.nn.CrossEntropyLoss()
-        # optimizer = torch.optim.Adam(self.local_model.parameters(), lr=lr)
         optimizer = torch.optim.SGD(self.local_model.parameters(), lr=lr, momentum=self.config["momentum"],
                                     weight_decay=decay)
-        # scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
-        #                                                  milestones=[0.5 * 15,
-        #                                                              0.9 * 15],
-        #                                                  gamma=0.1)
-
-        # scheduler = torch.optim.lr_scheduler.StepLR(optimizer,
-        #                                                  gamma=0.1)
         alpha_loss = 1
         e_loss = []
         acc = []
@@ -105,10 +86,6 @@ class Client:
             dataset_size = 0
             correct = 0
             self.local_model.train()
-
-            # if not self.benign:
-            #     scheduler.step()
-            #     print(f'Current attacker lr: {scheduler.get_lr()}')
 
             for data, labels in self.train_loader:
                 dataset_size += len(data)
@@ -150,6 +127,13 @@ class Client:
             accuracy = 100.0 * (float(correct) / float(dataset_size))
             acc.append(accuracy)
 
+        difference = self.calculate_difference(model)
+
+        total_loss = sum(e_loss) / len(e_loss)
+        accuracy = sum(e_loss) / len(e_loss)
+        return difference, total_loss, accuracy
+
+    def calculate_difference(self, model):
         difference = {}
         if not self.benign:
             scale = self.config["total_clients"] / self.config["global_lr"]
@@ -159,9 +143,7 @@ class Client:
         else:
             for name, param in self.local_model.state_dict().items():
                 difference[name] = (param - model.state_dict()[name]).float()
-        total_loss = sum(e_loss) / len(e_loss)
-        accuracy = sum(e_loss) / len(e_loss)
-        return difference, total_loss, accuracy
+        return difference
 
 
 def model_dist_norm_var(model_1, model_2):

@@ -4,7 +4,7 @@ import torch
 from torch.utils.data import DataLoader
 import numpy as np
 import warnings
-from client import Client, CustomDataset, add_cross, to_device, get_device, inject_trigger, initialise_trigger_arr
+from client import Client, CustomDataset, inject_trigger, initialise_trigger_arr
 from preprocess_dataset import train_dataset, test_dataset
 
 warnings.filterwarnings("ignore")
@@ -22,7 +22,11 @@ def model_aggregate(weight_accumulator, global_model, conf):
             data.add_(update_per_layer)
 
 
-def server_train(adversaries, attack, global_net, config, client_idcs):
+def server_train(attack, global_net, config, client_idcs):
+    adversaries = 0
+    if attack:
+        adversaries = 1
+
     results = {"train_loss": [],
                "test_loss": [],
                "test_accuracy": [],
@@ -36,91 +40,92 @@ def server_train(adversaries, attack, global_net, config, client_idcs):
         m = config["total_clients"] * config["client_num_proportion"]
         print("Choosing", m, "clients.")
         print('Start Round {} ...'.format(curr_round))
-        local_weights, local_loss, local_acc = [], [], []
+        local_weights, local_loss, local_acc, idcs = [], [], [], []
 
         weight_accumulator = {}
         for name, params in global_net.state_dict().items():
             weight_accumulator[name] = torch.zeros_like(params).float()
 
+        # force an attack at round "poisoning_epoch"
         for adversary in range(1, adversaries + 1):
-            if curr_round == 1:
-            # if curr_round == config["poisoning_epoch"]:
+            if curr_round == config["poisoning_epoch"]:
                 m = m - 1
                 print("carrying out attack")
-                adversary_update = Client(dataset=train_dataset, batch_size=config["batch_size"],
-                                          client_id=client_idcs[-adversary],
-                                          benign=False, epochs=config["attacker_epochs"], config=config)
-
-                learning_rate = config["attacker_learning_rate"]
-                for i in range(len(config["lr_decrease_epochs"])):
-                    if curr_round > config["lr_decrease_epochs"][i]:
-                        learning_rate *= 0.5
-                    else:
-                        continue
-                weights, loss, train_acc = adversary_update.train(model=copy.deepcopy(global_net),
-                                                                  lr=learning_rate,
-                                                                  decay=config["attacker_decay"])
-
-                local_weights.append(copy.deepcopy(weights))
-                local_loss.append(loss)
-                local_acc.append(train_acc)
-
-                for name, params in global_net.state_dict().items():
-                    weight_accumulator[name].add_(weights[name])
+                client_update(-adversary, client_idcs, config, curr_round, global_net, local_acc, local_loss,
+                              local_weights, weight_accumulator, config["attacker_decay"], config["attacker_learning_rate"], config["attacker_epochs"], idcs)
 
         clients = np.random.choice(range(config["total_clients"] - adversaries), int(m), replace=False)
 
         for client in clients:
-            local_update = Client(dataset=train_dataset, batch_size=config["batch_size"], client_id=client_idcs[client],
-                                  benign=True, epochs=config["benign_epochs"], config=config)
-
-            learning_rate = config["benign_learning_rate"]
-            for i in range(len(config["lr_decrease_epochs"])):
-                if curr_round > config["lr_decrease_epochs"][i]:
-                    learning_rate *= 0.5
-                else:
-                    continue
-            weights, loss, train_acc = local_update.train(model=copy.deepcopy(global_net),
-                                                          lr=learning_rate, decay=config["benign_decay"])
-
-            local_weights.append(copy.deepcopy(weights))
-            local_loss.append(loss)
-            local_acc.append(train_acc)
-
-            for name, params in global_net.state_dict().items():
-                weight_accumulator[name].add_(weights[name])
+            client_update(client, client_idcs, config, curr_round, global_net, local_acc, local_loss,
+                          local_weights, weight_accumulator, config["benign_decay"], config["benign_learning_rate"], config["benign_epochs"], idcs)
 
         model_aggregate(weight_accumulator=weight_accumulator, global_model=global_net, conf=config)
 
-        # loss
-        loss_avg = sum(local_loss) / len(local_loss)
-        train_acc = 100 * sum(local_acc) / len(local_acc)
-        # train_acc, _ = testing(global_net, CustomDataset(train_dataset, idcs, config, True))
-        results["train_accuracy"].append(train_acc.item())
+        test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, global_net, idcs, results)
 
-        t_accuracy, t_loss = testing(global_net, test_dataset)
-        results["test_accuracy"].append(t_accuracy)
-        print("Finished benign test")
-        if attack:
-            backdoor_t_accuracy, backdoor_t_loss = poisoned_testing(global_net, test_dataset, config["poisoning_label"])
-            results["backdoor_test_accuracy"].append(backdoor_t_accuracy)
+        save_model(config, curr_round, global_net)
 
-        if best_accuracy < t_accuracy:
-            best_accuracy = t_accuracy
-        if curr_round < config["poisoning_epoch"]:
-            torch.save(global_net.state_dict(), "pretrained_models/from_beginning_before_attack.pt")
-            # open("results_from_beginning.txt", 'w').write(json.dumps(results))
 
+def save_model(config, curr_round, global_net):
+    if curr_round < config["poisoning_epoch"]:
+        torch.save(global_net.state_dict(), "pretrained_models/from_beginning_after_attack_attackOn100.pt")
+        # open("results_from_beginning.txt", 'w').write(json.dumps(results))
+
+    else:
+        torch.save(global_net.state_dict(), "pretrained_models/from_beginning_before_attack_changed_params.pt")
+
+
+def test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, global_net, idcs, results):
+    train_acc, train_loss = testing(global_net, CustomDataset(train_dataset, idcs, config, True))
+    results["train_accuracy"].append(train_acc)
+    results["train_loss"].append(train_loss)
+
+    t_accuracy, t_loss = testing(global_net, test_dataset)
+    results["test_accuracy"].append(t_accuracy)
+    results["test_loss"].append(t_loss)
+
+    print("Finished benign test")
+
+    if attack:
+        backdoor_t_accuracy, backdoor_t_loss = poisoned_testing(global_net, test_dataset, config["poisoning_label"])
+        results["backdoor_test_accuracy"].append(backdoor_t_accuracy)
+        results["backdoor_test_loss"].append(backdoor_t_loss)
+
+    if best_accuracy < t_accuracy:
+        best_accuracy = t_accuracy
+
+    print("TRAIN ACCURACY", train_acc)
+    print()
+    print("BACKDOOR:", backdoor_t_accuracy)
+    print("MAIN ACCURACY:", t_accuracy)
+    print()
+
+    open("logs/from_beginning_before_attack_changed_params.txt", 'w').write(json.dumps(results))
+
+
+def client_update(client, client_idcs, config, curr_round, global_net, local_acc, local_loss, local_weights,
+                  weight_accumulator, decay, learning_rate, client_epochs, idcs):
+
+    adversary_update = Client(dataset=train_dataset, batch_size=config["batch_size"],
+                              client_id=client_idcs[client],
+                              benign=False, epochs=client_epochs, config=config)
+
+    for i in range(len(config["lr_decrease_epochs"])):
+        if curr_round > config["lr_decrease_epochs"][i]:
+            learning_rate *= 0.5
         else:
-            torch.save(global_net.state_dict(), "pretrained_models/from_beginning_after_attack.pt")
+            continue
+    weights, loss, train_acc = adversary_update.train(model=copy.deepcopy(global_net),
+                                                      lr=learning_rate,
+                                                      decay=decay)
+    local_weights.append(copy.deepcopy(weights))
+    local_loss.append(loss)
+    local_acc.append(train_acc)
+    idcs.append(client_idcs[client])
 
-        open("logs/results_from_beginning_lr1.txt", 'w').write(json.dumps(results))
-
-        print("TRAIN ACCURACY", train_acc.item())
-        print()
-        print("BACKDOOR:", backdoor_t_accuracy)
-        print("MAIN ACCURACY:", t_accuracy)
-        print()
+    for name, params in global_net.state_dict().items():
+        weight_accumulator[name].add_(weights[name])
 
 
 def testing(model, dataset, poisoning_label=None):

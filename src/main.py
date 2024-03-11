@@ -5,6 +5,7 @@ from preprocess_dataset import train_dataset, test_dataset, train_labels
 import warnings
 from server import server_train, testing
 from client import to_device, resnet_18, device, classes
+
 warnings.filterwarnings("ignore")
 
 
@@ -17,11 +18,7 @@ def federated_learning(attack=False, preload=False):
         # print("BEFORE", t_accuracy)
         print("BEFORE:  93.38")
 
-    adversaries = 0
-    if attack:
-        adversaries = 1
-
-    server_train(adversaries, attack, global_net, config, client_idcs)
+    server_train(attack, global_net, config, client_idcs)
 
 
 def split_non_iid(alpha):
@@ -53,8 +50,6 @@ def split_non_iid(alpha):
     client_idcs = [train_idcs[np.concatenate(idcs)] for idcs in client_idcs]
 
     return client_idcs
-
-
 
 
 if __name__ == '__main__':
