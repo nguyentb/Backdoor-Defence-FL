@@ -1,28 +1,24 @@
 import torch
 import yaml
-# from matplotlib import pyplot as plt
 import numpy as np
 from preprocess_dataset import train_dataset, test_dataset, train_labels
 import warnings
 from server import server_train, testing
 from client import to_device, resnet_18, device, classes
+
 warnings.filterwarnings("ignore")
 
 
-def federated_learning(attack=False):
+def federated_learning(attack=False, preload=False):
     cifar_cnn = resnet_18()
     global_net = to_device(cifar_cnn, device)
-    global_net.load_state_dict(torch.load("src/no_attack_new.pt"))
+    if preload:
+        global_net.load_state_dict(torch.load("pretrained_models/no_attack_new.pt"))
+        # t_accuracy, t_loss = testing(global_net, test_dataset)
+        # print("BEFORE", t_accuracy)
+        print("BEFORE:  93.38")
 
-    adversaries = 0
-    if attack:
-        adversaries = 1
-
-    # t_accuracy, t_loss = testing(global_net, test_dataset)
-    # print("BEFORE", t_accuracy)
-    print("BEFORE:  93.38")
-
-    server_train(adversaries, attack, global_net, config, client_idcs)
+    server_train(attack, global_net, config, client_idcs)
 
 
 def split_non_iid(alpha):
@@ -56,22 +52,14 @@ def split_non_iid(alpha):
     return client_idcs
 
 
-def show(image):
-    """Show image with landmarks"""
-
-    image = image.permute(1, 2, 0)
-    image = image.clamp(0, 1)
-    #
-    # plt.imshow(image)
-    # plt.pause(0.001)  # pause a bit so that plots are updated
-
-
 if __name__ == '__main__':
     with open("utils/params.yaml", 'r') as file:
         config = yaml.safe_load(file)
+
+    np.random.seed(0)
 
     train_idcs = np.random.permutation(len(train_dataset))
     test_idcs = np.random.permutation(len(test_dataset))
     client_idcs = split_non_iid(config["dirichlet_alpha"])
 
-    federated_learning(True)
+    federated_learning(True, bool(config["preload_model"]))
