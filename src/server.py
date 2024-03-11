@@ -53,13 +53,13 @@ def server_train(attack, global_net, config, client_idcs):
                 print("carrying out attack")
                 client_update(-adversary, client_idcs, config, curr_round, global_net, local_acc, local_loss,
                               local_weights, weight_accumulator, config["attacker_decay"], config["attacker_learning_rate"], config["attacker_epochs"], idcs)
-
+                idcs = idcs + (client_idcs[-adversary])
         clients = np.random.choice(range(config["total_clients"] - adversaries), int(m), replace=False)
 
         for client in clients:
             client_update(client, client_idcs, config, curr_round, global_net, local_acc, local_loss,
                           local_weights, weight_accumulator, config["benign_decay"], config["benign_learning_rate"], config["benign_epochs"], idcs)
-
+            idcs = idcs + (client_idcs[client])
         model_aggregate(weight_accumulator=weight_accumulator, global_model=global_net, conf=config)
 
         test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, global_net, idcs, results)
@@ -122,7 +122,6 @@ def client_update(client, client_idcs, config, curr_round, global_net, local_acc
     local_weights.append(copy.deepcopy(weights))
     local_loss.append(loss)
     local_acc.append(train_acc)
-    idcs.append(client_idcs[client])
 
     for name, params in global_net.state_dict().items():
         weight_accumulator[name].add_(weights[name])
