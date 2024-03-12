@@ -12,13 +12,12 @@ lr_decrease_epochs: [60, 100, 160, 200]
 # Server
 global_lr: 1
 
-
 # Benign client
 batch_size: 32
-benign_learning_rate: 0.001
+benign_learning_rate: 0.01
 #benign_learning_rate: 0.05
 #benign_decay: 0.005
-benign_decay: 0.005
+benign_decay: 0.0005
 benign_epochs: 2
 momentum: 0.9
 
