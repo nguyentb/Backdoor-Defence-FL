@@ -4,8 +4,9 @@ import torch
 from torch.utils.data import DataLoader
 import numpy as np
 import warnings
-from client import Client, inject_trigger, initialise_trigger_arr
+from client import Client, inject_trigger, initialise_trigger_arr, get_device
 from preprocess_dataset import train_dataset, test_dataset
+import defense
 
 warnings.filterwarnings("ignore")
 
@@ -36,6 +37,8 @@ def server_train(attack, global_net, config, client_idcs):
 
     best_accuracy = 0
     backdoor_t_accuracy = 0
+    device = get_device()
+    defense.clean_model(global_net, device, True)
     for curr_round in range(1, config["rounds"] + 1):
         m = config["total_clients"] * config["client_num_proportion"]
         print("Choosing", m, "clients.")
@@ -54,12 +57,14 @@ def server_train(attack, global_net, config, client_idcs):
                 client_update(-adversary, client_idcs, config, curr_round, global_net, local_acc, local_loss,
                               local_weights, weight_accumulator, config["attacker_decay"], config["attacker_learning_rate"], config["attacker_epochs"], False)
 
-        clients = np.random.choice(range(config["total_clients"] - adversaries), int(m), replace=False)
+        clients = list(np.random.choice(range(config["total_clients"] - adversaries), int(m), replace=False))
         for client in clients:
             client_update(client, client_idcs, config, curr_round, global_net, local_acc, local_loss,
                           local_weights, weight_accumulator, config["benign_decay"], config["benign_learning_rate"], config["benign_epochs"], True)
 
         model_aggregate(weight_accumulator=weight_accumulator, global_model=global_net, conf=config)
+
+        defense.clean_model(global_net, device)
 
         test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, global_net, results, local_acc, local_loss)
 
