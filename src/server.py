@@ -23,10 +23,51 @@ def model_aggregate(weight_accumulator, global_model, conf):
             data.add_(update_per_layer)
 
 
+def detect_attackers(attack_condition, client_tags, clients, adversaries):
+    print()
+    print("Server received notice that model was poisoned")
+    if attack_condition:
+        print("Attack was correctly detected")
+
+        for adversary in adversaries:
+            clients.append(adversary)
+
+    for client in clients:
+        if client not in client_tags.keys():
+            client_tags[client] = 1
+        else:
+            client_tags[client] += 1
+
+    print(client_tags)
+    print()
+
+
+def remove_attackers(client_tags, benign_clients, adversaries):
+    print()
+    for tagged_client in client_tags.keys():
+        if client_tags[tagged_client] > 5:
+            print("removing client", tagged_client, "from training, as they were tagged over the threshold.")
+
+            if tagged_client in benign_clients:
+                benign_clients = benign_clients.remove(benign_clients)
+
+            elif tagged_client in adversaries:
+                adversaries = adversaries.remove(benign_clients)
+
+                if not adversaries:
+                    print("All adversaries have been removed.")
+
+            else:
+                print("Error: client was not found in list")
+        print()
+
+    return benign_clients, adversaries
+
+
 def server_train(attack, global_net, config, client_idcs):
-    adversaries = 0
+    adversary_num = 0
     if attack:
-        adversaries = 1
+        adversary_num = 1
 
     results = {"train_loss": [],
                "test_loss": [],
@@ -38,8 +79,18 @@ def server_train(attack, global_net, config, client_idcs):
     best_accuracy = 0
     backdoor_t_accuracy = 0
     device = get_device()
-    defense.clean_model(global_net, device, True)
+    # defense.clean_model(global_net, device, True)
+    client_tags = {}
+
+    benign_clients = range(config["total_clients"] - adversary_num)
+    adversaries = range(len(benign_clients)+1, config["total_clients"])
+
+    print("Benign clients: ", benign_clients)
+    print("Adversaries: ", adversaries)
+
     for curr_round in range(1, config["rounds"] + 1):
+        attack_condition = config["poisoning_epoch"]
+
         m = config["total_clients"] * config["client_num_proportion"]
         print("Choosing", m, "clients.")
         print('Start Round {} ...'.format(curr_round))
@@ -49,24 +100,32 @@ def server_train(attack, global_net, config, client_idcs):
         for name, params in global_net.state_dict().items():
             weight_accumulator[name] = torch.zeros_like(params).float()
 
-        for adversary in range(1, adversaries + 1):
+        for adversary in adversaries:
             # force an attack at round "poisoning_epoch"
-            if curr_round == config["poisoning_epoch"]:
+            if attack_condition:
                 m = m - 1
                 print("carrying out attack")
-                client_update(-adversary, client_idcs, config, curr_round, global_net, local_acc, local_loss,
-                              local_weights, weight_accumulator, config["attacker_decay"], config["attacker_learning_rate"], config["attacker_epochs"], False)
+                client_update(adversary, client_idcs, config, curr_round, global_net, local_acc, local_loss,
+                              local_weights, weight_accumulator, config["attacker_decay"],
+                              config["attacker_learning_rate"], config["attacker_epochs"], False)
 
-        clients = list(np.random.choice(range(config["total_clients"] - adversaries), int(m), replace=False))
+        clients = list(np.random.choice(benign_clients, int(m), replace=False))
         for client in clients:
             client_update(client, client_idcs, config, curr_round, global_net, local_acc, local_loss,
-                          local_weights, weight_accumulator, config["benign_decay"], config["benign_learning_rate"], config["benign_epochs"], True)
+                          local_weights, weight_accumulator, config["benign_decay"], config["benign_learning_rate"],
+                          config["benign_epochs"], True)
 
         model_aggregate(weight_accumulator=weight_accumulator, global_model=global_net, conf=config)
 
-        defense.clean_model(global_net, device)
+        poisoned = defense.clean_model(global_net, device)
 
-        test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, global_net, results, local_acc, local_loss)
+        if poisoned:
+            detect_attackers(attack_condition, client_tags, clients, adversaries)
+
+        benign_clients, adversaries = remove_attackers(client_tags, benign_clients, adversaries)
+
+        test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, global_net, results, local_acc,
+                              local_loss)
 
         save_model(config, curr_round, global_net)
 
@@ -80,7 +139,8 @@ def save_model(config, curr_round, global_net):
         torch.save(global_net.state_dict(), "pretrained_models/from_beginning_before_attack_changed_params.pt")
 
 
-def test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, global_net, results, local_acc, local_loss):
+def test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, global_net, results, local_acc,
+                          local_loss):
     train_acc = sum(local_acc) / len(local_acc)
     train_loss = sum(local_loss) / len(local_loss)
     results["train_accuracy"].append(train_acc)
@@ -111,7 +171,6 @@ def test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, gl
 
 def client_update(client, client_idcs, config, curr_round, global_net, local_acc, local_loss, local_weights,
                   weight_accumulator, decay, learning_rate, client_epochs, benign):
-
     adversary_update = Client(dataset=train_dataset, batch_size=config["batch_size"],
                               client_id=client_idcs[client],
                               benign=benign, epochs=client_epochs, config=config)
