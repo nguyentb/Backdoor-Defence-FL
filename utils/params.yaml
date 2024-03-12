@@ -1,5 +1,6 @@
 # Federated Learning
 preload_model: False
+carry_attack: False
 total_clients: 70
 client_num_proportion: 0.2
 rounds: 200
@@ -14,7 +15,7 @@ global_lr: 1
 
 # Benign client
 batch_size: 32
-benign_learning_rate: 0.01
+benign_learning_rate: 0.001
 #benign_learning_rate: 0.05
 #benign_decay: 0.005
 benign_decay: 0.005
