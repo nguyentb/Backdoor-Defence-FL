@@ -62,4 +62,4 @@ if __name__ == '__main__':
     test_idcs = np.random.permutation(len(test_dataset))
     client_idcs = split_non_iid(config["dirichlet_alpha"])
 
-    federated_learning(True, bool(config["preload_model"]))
+    federated_learning(bool(config["carry_attack"]), bool(config["preload_model"]))

@@ -13,7 +13,7 @@ from bloodCellDataset import labels
 
 
 class CustomDataset(Dataset):
-    def __init__(self, dataset, idxs, benign, config):
+    def __init__(self, dataset, idxs, config):
         self.dataset = dataset
         self.idxs = list(idxs)
         self.poisoned_idxs = []
@@ -53,7 +53,6 @@ def inject_trigger(imgs, labels, poisoning_label, pos, poisoning_num):
             img[2][pos[i][0]][pos[i][1]] = 0
 
         # imgs[m] = add_cross(imgs[m])
-
         # show(imgs[m])
         poisoned_labels[m] = poisoning_label
     return poisoned_labels, imgs
@@ -61,7 +60,7 @@ def inject_trigger(imgs, labels, poisoning_label, pos, poisoning_num):
 
 class Client:
     def __init__(self, client_id, dataset, batch_size, benign=True, epochs=1, config=None):
-        self.train_loader = DataLoader(CustomDataset(dataset, client_id, benign, config), batch_size=batch_size,
+        self.train_loader = DataLoader(CustomDataset(dataset, client_id, config), batch_size=batch_size,
                                        shuffle=True)
         self.benign = benign
         self.epochs = epochs
@@ -90,11 +89,11 @@ class Client:
             for data, labels in self.train_loader:
                 dataset_size += len(data)
 
+                # poison images
                 if not self.benign:
                     labels, data = inject_trigger(data, labels, self.config["poisoning_label"], pos,
                                                   self.config["poisoning_num"])
 
-                # test accuracy of backdoor
                 if torch.cuda.is_available():
                     data, labels = data.cuda(), labels.cuda()
 
@@ -106,16 +105,15 @@ class Client:
                 loss = criterion(output, labels)
 
                 if not self.benign:
-                    # do a backwards pass
                     distance_loss = model_dist_norm_var(self.local_model, model)
                     # Lmodel = αLclass + (1 − α)Lano; alpha_loss =1 fixed
                     loss = alpha_loss * loss + (1 - alpha_loss) * distance_loss
 
+                # do a backwards pass
                 loss.backward()
                 # perform a single optimization step
                 optimizer.step()
                 # update training loss
-
                 train_loss += loss.data
 
                 pred = output.data.max(1)[1]  # get the index of the max log-probability
@@ -130,7 +128,7 @@ class Client:
         difference = self.calculate_difference(model)
 
         total_loss = sum(e_loss) / len(e_loss)
-        accuracy = sum(e_loss) / len(e_loss)
+        accuracy = sum(acc) / len(acc)
         return difference, total_loss, accuracy
 
     def calculate_difference(self, model):

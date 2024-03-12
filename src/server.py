@@ -4,7 +4,7 @@ import torch
 from torch.utils.data import DataLoader
 import numpy as np
 import warnings
-from client import Client, CustomDataset, inject_trigger, initialise_trigger_arr
+from client import Client, inject_trigger, initialise_trigger_arr
 from preprocess_dataset import train_dataset, test_dataset
 
 warnings.filterwarnings("ignore")
@@ -40,29 +40,28 @@ def server_train(attack, global_net, config, client_idcs):
         m = config["total_clients"] * config["client_num_proportion"]
         print("Choosing", m, "clients.")
         print('Start Round {} ...'.format(curr_round))
-        local_weights, local_loss, local_acc, idcs = [], [], [], []
+        local_weights, local_loss, local_acc = [], [], []
 
         weight_accumulator = {}
         for name, params in global_net.state_dict().items():
             weight_accumulator[name] = torch.zeros_like(params).float()
 
-        # force an attack at round "poisoning_epoch"
         for adversary in range(1, adversaries + 1):
+            # force an attack at round "poisoning_epoch"
             if curr_round == config["poisoning_epoch"]:
                 m = m - 1
                 print("carrying out attack")
                 client_update(-adversary, client_idcs, config, curr_round, global_net, local_acc, local_loss,
-                              local_weights, weight_accumulator, config["attacker_decay"], config["attacker_learning_rate"], config["attacker_epochs"], idcs)
-                idcs = idcs + (client_idcs[-adversary])
-        clients = np.random.choice(range(config["total_clients"] - adversaries), int(m), replace=False)
+                              local_weights, weight_accumulator, config["attacker_decay"], config["attacker_learning_rate"], config["attacker_epochs"], False)
 
+        clients = np.random.choice(range(config["total_clients"] - adversaries), int(m), replace=False)
         for client in clients:
             client_update(client, client_idcs, config, curr_round, global_net, local_acc, local_loss,
-                          local_weights, weight_accumulator, config["benign_decay"], config["benign_learning_rate"], config["benign_epochs"], idcs)
-            idcs = idcs + (client_idcs[client])
+                          local_weights, weight_accumulator, config["benign_decay"], config["benign_learning_rate"], config["benign_epochs"], True)
+
         model_aggregate(weight_accumulator=weight_accumulator, global_model=global_net, conf=config)
 
-        test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, global_net, idcs, results)
+        test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, global_net, results, local_acc, local_loss)
 
         save_model(config, curr_round, global_net)
 
@@ -76,10 +75,11 @@ def save_model(config, curr_round, global_net):
         torch.save(global_net.state_dict(), "pretrained_models/from_beginning_before_attack_changed_params.pt")
 
 
-def test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, global_net, idcs, results):
-    train_acc, train_loss = testing(global_net, CustomDataset(train_dataset, idcs, config, True))
+def test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, global_net, results, local_acc, local_loss):
+    train_acc = sum(local_acc) / len(local_acc)
+    train_loss = sum(local_loss) / len(local_loss)
     results["train_accuracy"].append(train_acc)
-    results["train_loss"].append(train_loss)
+    results["train_loss"].append(train_loss.item())
 
     t_accuracy, t_loss = testing(global_net, test_dataset)
     results["test_accuracy"].append(t_accuracy)
@@ -105,11 +105,11 @@ def test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, gl
 
 
 def client_update(client, client_idcs, config, curr_round, global_net, local_acc, local_loss, local_weights,
-                  weight_accumulator, decay, learning_rate, client_epochs, idcs):
+                  weight_accumulator, decay, learning_rate, client_epochs, benign):
 
     adversary_update = Client(dataset=train_dataset, batch_size=config["batch_size"],
                               client_id=client_idcs[client],
-                              benign=False, epochs=client_epochs, config=config)
+                              benign=benign, epochs=client_epochs, config=config)
 
     for i in range(len(config["lr_decrease_epochs"])):
         if curr_round > config["lr_decrease_epochs"][i]:

@@ -2,7 +2,8 @@ import os
 import numpy as np
 import pandas as pd
 import torch
-from torchvision.transforms import v2
+# from torchvision.transforms import v2
+from torchvision import transforms as v2
 from bloodCellDataset import BloodCellDataset
 # from sklearn.model_selection import train_test_split
 
@@ -41,8 +42,7 @@ IMAGE_SIZE = 360
 
 def calc_mean_std():
     transform = v2.Compose([
-        v2.ToImage(),
-        v2.ToDtype(torch.float32, scale=True),
+        v2.ToPILImage(),
         v2.Resize((IMAGE_SIZE, IMAGE_SIZE), antialias=True)
     ])
     dataset = BloodCellDataset(df, transform)
@@ -71,17 +71,17 @@ def calc_mean_std():
 
 mean, std = [0.8738966, 0.7487087, 0.7215933], [0.15496783, 0.18204536, 0.07819032]
 
-composed_train = v2.Compose([v2.ToImage(),
-                             v2.ToDtype(torch.uint8, scale=True),
+composed_train = v2.Compose([
                              v2.Resize((IMAGE_SIZE, IMAGE_SIZE), antialias=True),
-                             v2.ToDtype(torch.float32, scale=True),
+                             v2.RandomHorizontalFlip(),
+                             v2.ToTensor(),
                              v2.Normalize(mean, std),
+                             v2.RandomErasing(p=0.75, scale=(0.02, 0.1), value=1.0, inplace=False)
                              ])
 
-composed_test = v2.Compose([v2.ToImage(),
-                            v2.ToDtype(torch.uint8, scale=True),
+composed_test = v2.Compose([
                             v2.Resize((IMAGE_SIZE, IMAGE_SIZE), antialias=True),
-                            v2.ToDtype(torch.float32, scale=True),
+                            v2.ToTensor(),
                             v2.Normalize(mean, std)
                             ])
 
