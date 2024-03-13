@@ -71,16 +71,14 @@ def calc_mean_std():
 
 mean, std = [0.8738966, 0.7487087, 0.7215933], [0.15496783, 0.18204536, 0.07819032]
 
-composed_train = v2.Compose([
-                             v2.Resize((IMAGE_SIZE, IMAGE_SIZE), antialias=True),
+composed_train = v2.Compose([v2.Resize((IMAGE_SIZE, IMAGE_SIZE), antialias=True),
                              v2.RandomHorizontalFlip(),
                              v2.ToTensor(),
                              v2.Normalize(mean, std),
                              v2.RandomErasing(p=0.75, scale=(0.02, 0.1), value=1.0, inplace=False)
                              ])
 
-composed_test = v2.Compose([
-                            v2.Resize((IMAGE_SIZE, IMAGE_SIZE), antialias=True),
+composed_test = v2.Compose([v2.Resize((IMAGE_SIZE, IMAGE_SIZE), antialias=True),
                             v2.ToTensor(),
                             v2.Normalize(mean, std)
                             ])

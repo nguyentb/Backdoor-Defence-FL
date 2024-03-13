@@ -24,7 +24,6 @@ class CustomDataset(Dataset):
 
     def __getitem__(self, item):
         image, label = self.dataset[self.idxs[item]]
-
         return image, torch.tensor((label), dtype=torch.int8).type(torch.LongTensor)
 
 
@@ -72,8 +71,16 @@ class Client:
             self.local_model.state_dict()[name].copy_(param.clone())
 
         criterion = torch.nn.CrossEntropyLoss()
-        optimizer = torch.optim.SGD(self.local_model.parameters(), lr=lr, momentum=self.config["momentum"],
-                                    weight_decay=decay)
+
+        if self.config["optimizer"] == "Adam":
+            optimizer = torch.optim.Adam(self.local_model.parameters(), lr=lr)
+
+        else:
+            optimizer = torch.optim.SGD(self.local_model.parameters(), lr=lr, momentum=self.config["momentum"],
+                                        weight_decay=decay)
+
+        if self.config["scheduler"]:
+            scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min')
 
 
         alpha_loss = 1
@@ -120,6 +127,9 @@ class Client:
 
                 pred = output.data.max(1)[1]  # get the index of the max log-probability
                 correct += pred.eq(labels.data.view_as(pred)).cpu().sum().item()
+
+                if self.config["scheduler"]:
+                    scheduler.step(train_loss)
 
             # average losses
             t_loss = train_loss / dataset_size

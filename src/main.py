@@ -56,6 +56,8 @@ if __name__ == '__main__':
     with open("utils/params.yaml", 'r') as file:
         config = yaml.safe_load(file)
 
+    print(config)
+
     np.random.seed(0)
 
     train_idcs = np.random.permutation(len(train_dataset))

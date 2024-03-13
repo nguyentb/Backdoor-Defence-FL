@@ -20,8 +20,15 @@ benign_learning_rate: 0.001
 #benign_decay: 0.005
 benign_decay: 0.0005
 benign_epochs: 2
-momentum: 0.9
-#momentum: 0.2
+#momentum: 0.9
+momentum: 0.6
+
+scheduler: True
+
+optimizer: SGD
+#optimizer: Adam
+#log_file: new_Adam_start
+log_file: new_SGD_start
 
 # Malicious client
 poisoning_label: 2

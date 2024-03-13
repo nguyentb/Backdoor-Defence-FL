@@ -75,11 +75,11 @@ def server_train(attack, global_net, config, client_idcs):
 
 def save_model(config, curr_round, global_net):
     if curr_round < config["poisoning_epoch"]:
-        torch.save(global_net.state_dict(), "pretrained_models/from_beginning_after_attack_attackOn100.pt")
+        torch.save(global_net.state_dict(), "pretrained_models/"+config["log_file"]+"_no_attack.pt")
         # open("results_from_beginning.txt", 'w').write(json.dumps(results))
 
     else:
-        torch.save(global_net.state_dict(), "pretrained_models/from_beginning_before_attack_changed_params.pt")
+        torch.save(global_net.state_dict(), "pretrained_models/"+config["log_file"]+".pt")
 
 
 def test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, global_net, results, local_acc, local_loss):
@@ -108,7 +108,7 @@ def test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, gl
     print("MAIN ACCURACY:", t_accuracy)
     print()
 
-    open("logs/from_beginning_before_attack_changed_params.txt", 'w').write(json.dumps(results))
+    open("logs/"+config["log_file"]+".txt", 'w').write(json.dumps(results))
 
 
 def client_update(client, client_idcs, config, curr_round, global_net, local_acc, local_loss, local_weights,
