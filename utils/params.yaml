@@ -20,8 +20,8 @@ benign_learning_rate: 0.001
 #benign_decay: 0.005
 benign_decay: 0.005
 benign_epochs: 2
-momentum: 0.9
-
+#momentum: 0.9
+momentum: 0.2
 
 # Malicious client
 poisoning_label: 2
