@@ -1,8 +1,8 @@
 # Federated Learning
 preload_model: False
-carry_attack: False
+carry_attack: True
 total_clients: 70
-client_num_proportion: 0.2
+client_num_proportion: 0.002
 rounds: 200
 dirichlet_alpha: 0.9
 

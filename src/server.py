@@ -82,16 +82,17 @@ def server_train(attack, global_net, config, client_idcs):
     # defense.clean_model(global_net, device, True)
     client_tags = {}
 
-    benign_clients = range(config["total_clients"] - adversary_num)
-    adversaries = range(len(benign_clients)+1, config["total_clients"])
+    benign_clients = list(range(config["total_clients"] - adversary_num))
+    adversaries = list(range(len(benign_clients), config["total_clients"]))
 
     print("Benign clients: ", benign_clients)
     print("Adversaries: ", adversaries)
 
     for curr_round in range(1, config["rounds"] + 1):
-        attack_condition = config["poisoning_epoch"]
+        # attack_condition = config["poisoning_epoch"]
+        attack_condition = True
 
-        m = config["total_clients"] * config["client_num_proportion"]
+        m = max(config["total_clients"] * config["client_num_proportion"], 1)
         print("Choosing", m, "clients.")
         print('Start Round {} ...'.format(curr_round))
         local_weights, local_loss, local_acc = [], [], []

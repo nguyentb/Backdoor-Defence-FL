@@ -95,11 +95,14 @@ def testing(model, dataset):
 def test_accuracy(text, model, test_set):
     ASR = poisoned_testing(model, test_set)
     ACC = testing(model, test_set)
-
+    print("testing")
     # clean data
-    print('ACC', text, ACC)
+    # print('ACC', text, ACC)
     # Attack Success Rate
-    print('ASR', text, ASR)
+    # print('ASR', text, ASR)
+    print(ACC)
+    # Attack Success Rate
+    print(ASR)
 
 
 def calc_diff(new_model, old_model):
@@ -113,13 +116,14 @@ def calc_diff(new_model, old_model):
 
         differences = differences.flatten().tolist()
         avg = sum(differences) / len(differences)
-        print("AVERAGE OF DIFFERENCES:", str(avg))
-        print("MEDIAN OF DIFFERENCES:", str(statistics.median(differences)))
-        print("STANDARD DEVIATION OF DIFFERENCES:", str(statistics.stdev(differences)))
+        # print("AVERAGE OF DIFFERENCES:", str(avg))
+        # print("MEDIAN OF DIFFERENCES:", str(statistics.median(differences)))
+        # print("STANDARD DEVIATION OF DIFFERENCES:", str(statistics.stdev(differences)))
 
         print(str(avg))
         print(str(statistics.median(differences)))
         print(str(statistics.stdev(differences)))
+
     return avg
 
 
@@ -136,27 +140,27 @@ def calc_dist(new_model, old_model):
 
     with torch.no_grad():
         cosine = np.dot(new, old) / (norm(new) * norm(old))
-        print("COSINE DISTANCE:", cosine)
+        # print("COSINE DISTANCE:", cosine)
 
         euclidean = torch.sqrt(torch.sum(torch.pow(torch.subtract(old, new), 2), dim=0))
-        print("EUCLIDEAN DISTANCE:", euclidean)
+        # print("EUCLIDEAN DISTANCE:", euclidean)
 
         distance = ((old - new) ** 2).sum(axis=0)
-        print("l2 distance:", distance)
+        # print("l2 distance:", distance)
 
         old.unsqueeze_(0)
         new.unsqueeze_(0)
         output = torch.cdist(old, new, p=1)
-        print("Manahattan distance:", output)
+        # print("Manahattan distance:", output)
 
         hamming = torch.cdist(old, new, p=0)
-        print("hamming distance:", hamming)
+        # print("hamming distance:", hamming)
 
         print(cosine)
         print(euclidean.item())
         print(distance.item())
         print(output[0][0].item())
-        print("hamming distance:", hamming[0][0].item())
+        print(hamming[0][0].item())
 
 # def flatten_comprehension(matrix):
 #     return [item for row in matrix for item in row]
@@ -171,8 +175,8 @@ def flatten_comprehension(xs):
 
 def calculate_difference(model, old_model, test_set):
     print("CALCULATING DIFFERENCES ")
-    avg = calc_diff(model, old_model)
-    calc_dist(model, old_model)
+    avg = calc_diff(copy.deepcopy(model), copy.deepcopy(old_model))
+    calc_dist(copy.deepcopy(model), copy.deepcopy(old_model))
 
     prev_model = copy.deepcopy(model)
 
@@ -200,22 +204,21 @@ def calculate_difference(model, old_model, test_set):
         conv_avg = sum(conv) / len(conv)
         conv_dev = statistics.stdev(conv)
 
-        print("==================")
-        print("AVERAGE OF fc.weight DIFFERENCES:", str(sum(layer_d) / len(layer_d)))
-        print("MEDIAN OF fc.weight DIFFERENCES:", str(statistics.median(layer_d)))
-        print("STANDARD DEVIATION OF fc.weight DIFFERENCES:", str(statistics.stdev(layer_d)))
+        # print("==================")
+        # print("AVERAGE OF fc.weight DIFFERENCES:", str(sum(layer_d) / len(layer_d)))
+        # print("MEDIAN OF fc.weight DIFFERENCES:", str(statistics.median(layer_d)))
+        # print("STANDARD DEVIATION OF fc.weight DIFFERENCES:", str(statistics.stdev(layer_d)))
 
-        print("AVERAGE OF conv DIFFERENCES:", str(conv_avg))
-        print("MEDIAN OF conv DIFFERENCES:", str(statistics.median(conv)))
-        print("STANDARD DEVIATION OF conv DIFFERENCES:", str(conv_dev))
+        # print("AVERAGE OF conv DIFFERENCES:", str(conv_avg))
+        # print("MEDIAN OF conv DIFFERENCES:", str(statistics.median(conv)))
+        # print("STANDARD DEVIATION OF conv DIFFERENCES:", str(conv_dev))
 
-        print("AVERAGE OF conv DIFFERENCES:", str(sum(bn2) / len(bn2)))
-        print("MEDIAN OF conv DIFFERENCES:", str(statistics.median(bn2)))
-        print("STANDARD DEVIATION OF conv DIFFERENCES:", str(statistics.stdev(bn2)))
-        print("==================")
+        # print("AVERAGE OF conv DIFFERENCES:", str(sum(bn2) / len(bn2)))
+        # print("MEDIAN OF conv DIFFERENCES:", str(statistics.median(bn2)))
+        # print("STANDARD DEVIATION OF conv DIFFERENCES:", str(statistics.stdev(bn2)))
+        # print("==================")
 
-
-        print("==================")
+        # print("==================")
         print( str(sum(layer_d) / len(layer_d)))
         print( str(statistics.median(layer_d)))
         print( str(statistics.stdev(layer_d)))
@@ -227,12 +230,11 @@ def calculate_difference(model, old_model, test_set):
         print( str(sum(bn2) / len(bn2)))
         print(str(statistics.median(bn2)))
         print(str(statistics.stdev(bn2)))
-        print("==================")
-
+        # print("==================")
 
     model = copy.deepcopy(prev_model)
 
-    if conv_avg < -0.006 or (conv_avg/avg)> 10:
+    if conv_avg < -0.0065 or (conv_avg/avg)> 15:
         print("MODEL WAS POISONED")
         return True, model
 
@@ -242,9 +244,9 @@ def calculate_difference(model, old_model, test_set):
         model = copy.deepcopy(old_model)
         test_accuracy("after returning", copy.deepcopy(model), test_set)
 
-        return False, model
+        return False
 
-    return False, model
+    return False
 
 
 def imshow(img, title="2"):
@@ -286,8 +288,8 @@ def resnet_18():
 
 
 def apply_defense(rounds, model, imgs_tes, images_list, labels_list, unlloader, test_set,
-                  args, init, device, old_model):
-    # old_model = copy.deepcopy(model)
+                  args, init, device):
+    old_model = copy.deepcopy(model)
     test_accuracy("BEFORE", copy.deepcopy(model), test_set)
 
     def loss_inner(perturb, model_params):
@@ -359,17 +361,18 @@ def apply_defense(rounds, model, imgs_tes, images_list, labels_list, unlloader, 
         test_accuracy("AFTER", copy.deepcopy(model), test_set)
 
         if not repeated:
-            poisoned, n_model = calculate_difference(copy.deepcopy(model), copy.deepcopy(old_model), test_set)
-            model = copy.deepcopy(n_model)
+            poisoned = calculate_difference(model, old_model, test_set)
             if poisoned:
                 print("repeating cleaning")
                 repeated = True
                 _round = _round - 1
 
+        test_accuracy("outside", copy.deepcopy(model), test_set)
+
     return poisoned
 
 
-def clean_model(model, device, old_model = None, init=False):
+def clean_model(model, device, init=False):
     args = {'batch_size': 100, 'optim': 'Adam', 'lr': 0.004, 'K': 5, "lr_outer": 10}
 
     test_set, unl_set = get_eval_data()
@@ -388,8 +391,5 @@ def clean_model(model, device, old_model = None, init=False):
 
     return apply_defense(rounds=1, model=model, imgs_tes=imgs_tes, images_list=images_list,
                   labels_list=labels_list, unlloader=unlloader,
-                  test_set=test_set, args=args, init=init, device=device, old_model=old_model)
-
-
-
+                  test_set=test_set, args=args, init=init, device=device)
 
