@@ -95,7 +95,7 @@ def testing(model, dataset):
 def test_accuracy(text, model, test_set):
     ASR = poisoned_testing(model, test_set)
     ACC = testing(model, test_set)
-    print("testing")
+
     # clean data
     # print('ACC', text, ACC)
     # Attack Success Rate
@@ -174,7 +174,7 @@ def flatten_comprehension(xs):
 
 
 def calculate_difference(model, old_model, test_set):
-    print("CALCULATING DIFFERENCES ")
+    # print("CALCULATING DIFFERENCES ")
     avg = calc_diff(copy.deepcopy(model), copy.deepcopy(old_model))
     calc_dist(copy.deepcopy(model), copy.deepcopy(old_model))
 
@@ -234,19 +234,16 @@ def calculate_difference(model, old_model, test_set):
 
     model = copy.deepcopy(prev_model)
 
-    if conv_avg < -0.0065 or (conv_avg/avg)> 15:
+    if conv_avg < -0.0065 or (conv_avg/avg)> 15 or (conv_avg/avg)< -5:
         print("MODEL WAS POISONED")
-        return True, model
+        return 1, model
 
-    if conv_avg > -0.005:
+    if conv_avg > -0.005 and avg < 0:
         print("I KNOW IT IS CLEAN")
         print("Going back to previous model")
-        model = copy.deepcopy(old_model)
-        test_accuracy("after returning", copy.deepcopy(model), test_set)
+        return 0
 
-        return False
-
-    return False
+    return 2
 
 
 def imshow(img, title="2"):
@@ -266,7 +263,7 @@ def get_eval_data():
         transforms.Normalize(mean, std),
         # Normalizing with standard mean and standard deviation
     ])
-    test_set_o = CIFAR10('./', train=False, download=True, transform=composed_test)
+    test_set_o = CIFAR10('./', train=False, download=False, transform=composed_test)
 
     torch.manual_seed(43)
     val_size = math.floor(len(test_set_o) * 0.2)
@@ -290,6 +287,7 @@ def resnet_18():
 def apply_defense(rounds, model, imgs_tes, images_list, labels_list, unlloader, test_set,
                   args, init, device):
     old_model = copy.deepcopy(model)
+    print("apply defense")
     test_accuracy("BEFORE", copy.deepcopy(model), test_set)
 
     def loss_inner(perturb, model_params):
@@ -325,7 +323,6 @@ def apply_defense(rounds, model, imgs_tes, images_list, labels_list, unlloader, 
     repeated = init
     poisoned = False
     for _round in range(rounds):
-        print("apply defense")
 
         batch_pert = torch.zeros_like(imgs_tes, requires_grad=True, device=hg.get_device())
         batch_opt = torch.optim.SGD(params=[batch_pert], lr=10)
@@ -357,17 +354,15 @@ def apply_defense(rounds, model, imgs_tes, images_list, labels_list, unlloader, 
 
             outer_opt.step()
 
-        print('Round:', _round)
+        # print('Round:', _round)
         test_accuracy("AFTER", copy.deepcopy(model), test_set)
 
         if not repeated:
             poisoned = calculate_difference(model, old_model, test_set)
-            if poisoned:
+            if poisoned == 1:
                 print("repeating cleaning")
                 repeated = True
                 _round = _round - 1
-
-        test_accuracy("outside", copy.deepcopy(model), test_set)
 
     return poisoned
 
