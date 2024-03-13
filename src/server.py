@@ -56,8 +56,15 @@ def server_train(attack, global_net, config, client_idcs):
 
         clients = np.random.choice(range(config["total_clients"] - adversaries), int(m), replace=False)
         for client in clients:
+            learning_rate = config["benign_learning_rate"]
+            for i in range(len(config["lr_decrease_epochs"])):
+                if curr_round > config["lr_decrease_epochs"][i]:
+                    learning_rate *= 0.5
+                else:
+                    continue
+
             client_update(client, client_idcs, config, curr_round, global_net, local_acc, local_loss,
-                          local_weights, weight_accumulator, config["benign_decay"], config["benign_learning_rate"], config["benign_epochs"], True)
+                          local_weights, weight_accumulator, config["benign_decay"], learning_rate, config["benign_epochs"], True)
 
         model_aggregate(weight_accumulator=weight_accumulator, global_model=global_net, conf=config)
 

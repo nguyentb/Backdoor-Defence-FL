@@ -74,6 +74,8 @@ class Client:
         criterion = torch.nn.CrossEntropyLoss()
         optimizer = torch.optim.SGD(self.local_model.parameters(), lr=lr, momentum=self.config["momentum"],
                                     weight_decay=decay)
+
+
         alpha_loss = 1
         e_loss = []
         acc = []
@@ -184,8 +186,8 @@ def to_device(data, target_device):
 
 def resnet_18():
     resnet = resnet18()
-    for param in resnet.parameters():
-        param.requires_grad = False
+    # for param in resnet.parameters():
+    #     param.requires_grad = False
     resnet.fc = torch.nn.Linear(resnet.fc.in_features, classes)
     return resnet
 
