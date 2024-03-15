@@ -196,8 +196,8 @@ def to_device(data, target_device):
 
 def resnet_18():
     resnet = resnet18()
-    # for param in resnet.parameters():
-    #     param.requires_grad = False
+    for param in resnet.parameters():
+        param.requires_grad = False
     resnet.fc = torch.nn.Linear(resnet.fc.in_features, classes)
     return resnet
 

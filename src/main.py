@@ -13,7 +13,7 @@ def federated_learning(attack=False, preload=False):
     cifar_cnn = resnet_18()
     global_net = to_device(cifar_cnn, device)
     if preload:
-        global_net.load_state_dict(torch.load("pretrained_models/no_attack_new.pt"))
+        global_net.load_state_dict(torch.load("pretrained_models/"+config["preload_model_name"]+".pt"))
         # t_accuracy, t_loss = testing(global_net, test_dataset)
         # print("BEFORE", t_accuracy)
         print("BEFORE:  93.38")

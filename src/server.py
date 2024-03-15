@@ -34,6 +34,9 @@ def server_train(attack, global_net, config, client_idcs):
                "backdoor_test_loss": [],
                "backdoor_test_accuracy": []}
 
+    if config["preload_model"]:
+        results = json.load(open("logs/"+config["preload_model_name"]+".txt"))
+
     best_accuracy = 0
     backdoor_t_accuracy = 0
     for curr_round in range(1, config["rounds"] + 1):

@@ -1,5 +1,7 @@
 # Federated Learning
 preload_model: False
+preload_model_name: no_attack_new
+
 carry_attack: False
 total_clients: 70
 client_num_proportion: 0.2
@@ -15,20 +17,23 @@ global_lr: 1
 
 # Benign client
 batch_size: 32
-benign_learning_rate: 0.001
+benign_learning_rate: 0.01
 #benign_learning_rate: 0.05
 #benign_decay: 0.005
 benign_decay: 0.0005
 benign_epochs: 2
-#momentum: 0.9
-momentum: 0.6
+momentum: 0.9
+#momentum: 0.6
 
 scheduler: True
 
 optimizer: SGD
 #optimizer: Adam
 #log_file: new_Adam_start
-log_file: new_SGD_start
+#log_file: new_SGD_start_2
+#log_file: SGD_09momentum
+log_file: SGD_09momentum_01
+#log_file: Adam_last_layer
 
 # Malicious client
 poisoning_label: 2
