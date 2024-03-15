@@ -119,10 +119,12 @@ def calc_diff(new_model, old_model):
         # print("AVERAGE OF DIFFERENCES:", str(avg))
         # print("MEDIAN OF DIFFERENCES:", str(statistics.median(differences)))
         # print("STANDARD DEVIATION OF DIFFERENCES:", str(statistics.stdev(differences)))
-
-        print(str(avg))
-        print(str(statistics.median(differences)))
-        print(str(statistics.stdev(differences)))
+        try:
+          print(str(avg))
+          print(str(statistics.median(differences)))
+          print(str(statistics.stdev(differences)))
+        except ValueError:
+          print("There was no change in the model.")
 
     return avg
 
@@ -200,43 +202,45 @@ def calculate_difference(model, old_model, test_set):
         layer_d = layer_d.flatten().tolist()
         conv = conv.flatten().tolist()
         bn2 = bn2.flatten().tolist()
+        try:
+            conv_avg = sum(conv) / len(conv)
+            conv_dev = statistics.stdev(conv)
 
-        conv_avg = sum(conv) / len(conv)
-        conv_dev = statistics.stdev(conv)
+            # print("==================")
+            # print("AVERAGE OF fc.weight DIFFERENCES:", str(sum(layer_d) / len(layer_d)))
+            # print("MEDIAN OF fc.weight DIFFERENCES:", str(statistics.median(layer_d)))
+            # print("STANDARD DEVIATION OF fc.weight DIFFERENCES:", str(statistics.stdev(layer_d)))
 
-        # print("==================")
-        # print("AVERAGE OF fc.weight DIFFERENCES:", str(sum(layer_d) / len(layer_d)))
-        # print("MEDIAN OF fc.weight DIFFERENCES:", str(statistics.median(layer_d)))
-        # print("STANDARD DEVIATION OF fc.weight DIFFERENCES:", str(statistics.stdev(layer_d)))
+            # print("AVERAGE OF conv DIFFERENCES:", str(conv_avg))
+            # print("MEDIAN OF conv DIFFERENCES:", str(statistics.median(conv)))
+            # print("STANDARD DEVIATION OF conv DIFFERENCES:", str(conv_dev))
 
-        # print("AVERAGE OF conv DIFFERENCES:", str(conv_avg))
-        # print("MEDIAN OF conv DIFFERENCES:", str(statistics.median(conv)))
-        # print("STANDARD DEVIATION OF conv DIFFERENCES:", str(conv_dev))
+            # print("AVERAGE OF conv DIFFERENCES:", str(sum(bn2) / len(bn2)))
+            # print("MEDIAN OF conv DIFFERENCES:", str(statistics.median(bn2)))
+            # print("STANDARD DEVIATION OF conv DIFFERENCES:", str(statistics.stdev(bn2)))
+            # print("==================")
 
-        # print("AVERAGE OF conv DIFFERENCES:", str(sum(bn2) / len(bn2)))
-        # print("MEDIAN OF conv DIFFERENCES:", str(statistics.median(bn2)))
-        # print("STANDARD DEVIATION OF conv DIFFERENCES:", str(statistics.stdev(bn2)))
-        # print("==================")
+            # print("==================")
+            print( str(sum(layer_d) / len(layer_d)))
+            print( str(statistics.median(layer_d)))
+            print( str(statistics.stdev(layer_d)))
 
-        # print("==================")
-        print( str(sum(layer_d) / len(layer_d)))
-        print( str(statistics.median(layer_d)))
-        print( str(statistics.stdev(layer_d)))
+            print(str(conv_avg))
+            print(str(statistics.median(conv)))
+            print( str(conv_dev))
 
-        print(str(conv_avg))
-        print(str(statistics.median(conv)))
-        print( str(conv_dev))
-
-        print( str(sum(bn2) / len(bn2)))
-        print(str(statistics.median(bn2)))
-        print(str(statistics.stdev(bn2)))
-        # print("==================")
+            print( str(sum(bn2) / len(bn2)))
+            print(str(statistics.median(bn2)))
+            print(str(statistics.stdev(bn2)))
+            # print("==================")
+        except ValueError:
+            print("There was no difference in model.")
 
     model = copy.deepcopy(prev_model)
 
-    if conv_avg < -0.0065 or (conv_avg/avg)> 15 or (conv_avg/avg)< -5:
+    if conv_avg < -0.0065 or (conv_avg/avg)> 15 or (conv_avg/avg)< -4:
         print("MODEL WAS POISONED")
-        return 1, model
+        return 1
 
     if conv_avg > -0.005 and avg < 0:
         print("I KNOW IT IS CLEAN")
