@@ -76,6 +76,9 @@ def server_train(attack, global_net, config, client_idcs):
                "backdoor_test_loss": [],
                "backdoor_test_accuracy": []}
 
+    if config["preload_model"]:
+        results = json.load(open("logs/"+config["preload_model_name"]+".txt"))
+
     best_accuracy = 0
     backdoor_t_accuracy = 0
     device = get_device()
@@ -112,9 +115,17 @@ def server_train(attack, global_net, config, client_idcs):
 
         clients = list(np.random.choice(benign_clients, int(m), replace=False))
         for client in clients:
+            learning_rate = config["benign_learning_rate"]
+            for i in range(len(config["lr_decrease_epochs"])):
+                if curr_round > config["lr_decrease_epochs"][i]:
+                    learning_rate *= 0.5
+                else:
+                    continue
+
             client_update(client, client_idcs, config, curr_round, global_net, local_acc, local_loss,
                           local_weights, weight_accumulator, config["benign_decay"], config["benign_learning_rate"],
                           config["benign_epochs"], True)
+                          local_weights, weight_accumulator, config["benign_decay"], learning_rate, config["benign_epochs"], True)
 
         model_aggregate(weight_accumulator=weight_accumulator, global_model=global_net, conf=config)
 
@@ -133,11 +144,11 @@ def server_train(attack, global_net, config, client_idcs):
 
 def save_model(config, curr_round, global_net):
     if curr_round < config["poisoning_epoch"]:
-        torch.save(global_net.state_dict(), "pretrained_models/from_beginning_after_attack_attackOn100.pt")
+        torch.save(global_net.state_dict(), "pretrained_models/"+config["log_file"]+"_no_attack.pt")
         # open("results_from_beginning.txt", 'w').write(json.dumps(results))
 
     else:
-        torch.save(global_net.state_dict(), "pretrained_models/from_beginning_before_attack_changed_params.pt")
+        torch.save(global_net.state_dict(), "pretrained_models/"+config["log_file"]+".pt")
 
 
 def test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, global_net, results, local_acc,
@@ -167,7 +178,7 @@ def test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, gl
     print("MAIN ACCURACY:", t_accuracy)
     print()
 
-    open("logs/from_beginning_before_attack_changed_params.txt", 'w').write(json.dumps(results))
+    open("logs/"+config["log_file"]+".txt", 'w').write(json.dumps(results))
 
 
 def client_update(client, client_idcs, config, curr_round, global_net, local_acc, local_loss, local_weights,
