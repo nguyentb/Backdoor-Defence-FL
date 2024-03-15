@@ -23,14 +23,9 @@ def model_aggregate(weight_accumulator, global_model, conf):
             data.add_(update_per_layer)
 
 
-def detect_attackers(attack_condition, client_tags, clients, adversaries):
-    print()
-    print("Server received notice that model was poisoned")
-    if attack_condition:
-        print("Attack was correctly detected")
-
-        for adversary in adversaries:
-            clients.append(adversary)
+def detect_attackers(client_tags, clients, adversaries):
+    for adversary in adversaries:
+        clients.append(adversary)
 
     for client in clients:
         if client not in client_tags.keys():
@@ -42,27 +37,47 @@ def detect_attackers(attack_condition, client_tags, clients, adversaries):
     print()
 
 
+def remove_from_training(tagged_client, benign_clients, adversaries, client_tags):
+    print("removing client", tagged_client, "from training, as they were tagged over the threshold.")
+
+    if tagged_client in benign_clients:
+        benign_clients.remove(tagged_client)
+        client_tags.pop(tagged_client)
+
+    elif tagged_client in adversaries:
+        adversaries.remove(tagged_client)
+        client_tags.pop(tagged_client)
+
+    else:
+        print("Error: client was not found in list")
+
+    return  benign_clients, adversaries
+
+
 def remove_attackers(client_tags, benign_clients, adversaries):
     print()
-    for tagged_client in client_tags.keys():
-        if client_tags[tagged_client] > 5:
-            print("removing client", tagged_client, "from training, as they were tagged over the threshold.")
+    highest_clients = []
+    max = list(client_tags.values())[0]
+    prev_tags = copy.copy(client_tags)
 
-            if tagged_client in benign_clients:
-                benign_clients = benign_clients.remove(benign_clients)
+    for tagged_client in prev_tags.keys():
+        tag_num = prev_tags[tagged_client]
+        print(str(tagged_client), "has", str(tag_num), "votes.")
 
-            elif tagged_client in adversaries:
-                adversaries = adversaries.remove(benign_clients)
+        if tag_num ==  max:
+            highest_clients.append(tagged_client)
+        elif tag_num > max:
+            highest_clients = [tagged_client]
 
-                if not adversaries:
-                    print("All adversaries have been removed.")
+        # remove all clients that have appeared more than threshold
+        if tag_num > 5:
+             benign_clients, adversaries = remove_from_training(tagged_client, benign_clients, adversaries, client_tags)
 
-            else:
-                print("Error: client was not found in list")
-        print()
+    if len(highest_clients) == 1:
+        benign_clients, adversaries = remove_from_training(highest_clients[0], benign_clients, adversaries,client_tags)
 
+    print()
     return benign_clients, adversaries
-
 
 def server_train(attack, global_net, config, client_idcs):
     adversary_num = 0
@@ -88,6 +103,8 @@ def server_train(attack, global_net, config, client_idcs):
     benign_clients = list(range(config["total_clients"] - adversary_num))
     adversaries = list(range(len(benign_clients), config["total_clients"]))
 
+    round_adversary_num = adversary_num
+
     print("Benign clients: ", benign_clients)
     print("Adversaries: ", adversaries)
 
@@ -111,30 +128,57 @@ def server_train(attack, global_net, config, client_idcs):
                 print("carrying out attack")
                 client_update(adversary, client_idcs, config, curr_round, global_net, local_acc, local_loss,
                               local_weights, weight_accumulator, config["attacker_decay"],
-                              config["attacker_learning_rate"], config["attacker_epochs"], False)
+                              config["attacker_learning_rate"], config["attacker_epochs"], False, round_adversary_num)
 
         clients = list(np.random.choice(benign_clients, int(m), replace=False))
         for client in clients:
-            learning_rate = config["benign_learning_rate"]
-            for i in range(len(config["lr_decrease_epochs"])):
-                if curr_round > config["lr_decrease_epochs"][i]:
-                    learning_rate *= 0.5
-                else:
-                    continue
+            # learning_rate = config["benign_learning_rate"]
+            # for i in range(len(config["lr_decrease_epochs"])):
+            #     if curr_round > config["lr_decrease_epochs"][i]:
+            #         learning_rate *= 0.5
+            #     else:
+            #         continue
 
             client_update(client, client_idcs, config, curr_round, global_net, local_acc, local_loss,
                           local_weights, weight_accumulator, config["benign_decay"], config["benign_learning_rate"],
                           config["benign_epochs"], True)
-                          local_weights, weight_accumulator, config["benign_decay"], learning_rate, config["benign_epochs"], True)
 
         model_aggregate(weight_accumulator=weight_accumulator, global_model=global_net, conf=config)
 
+        state_before = copy.deepcopy(global_net.state_dict())
         poisoned = defense.clean_model(global_net, device)
 
-        if poisoned:
-            detect_attackers(attack_condition, client_tags, clients, adversaries)
+        if poisoned == 0:
+            if not attack_condition or len(adversaries) == 0:
+                print("Server CORRECTLY believes model was clean.")
 
-        benign_clients, adversaries = remove_attackers(client_tags, benign_clients, adversaries)
+            else:
+                print("Server INCORRECTLY believes model was clean.")
+
+            global_net.load_state_dict(state_before)
+
+        elif poisoned == 1:
+            print()
+            print("Server received notice that model was poisoned")
+
+            if attack_condition and len(adversaries) > 0:
+                print("Attack was correctly detected.")
+
+            else:
+                print("Attack was incorrectly detected.")
+
+            detect_attackers(client_tags, clients, adversaries)
+            benign_clients, adversaries = remove_attackers(client_tags, benign_clients, adversaries)
+
+            if not adversaries:
+                print("All adversaries have been removed.")
+                adversaries = []
+
+        elif not attack_condition or len(adversaries) == 0:
+            print("Model was not poisoned and model was not sure.")
+
+        elif attack_condition:
+            print("Model was poisoned and model was not sure.")
 
         test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, global_net, results, local_acc,
                               local_loss)
@@ -182,7 +226,7 @@ def test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, gl
 
 
 def client_update(client, client_idcs, config, curr_round, global_net, local_acc, local_loss, local_weights,
-                  weight_accumulator, decay, learning_rate, client_epochs, benign):
+                  weight_accumulator, decay, learning_rate, client_epochs, benign, round_adversary_num):
     adversary_update = Client(dataset=train_dataset, batch_size=config["batch_size"],
                               client_id=client_idcs[client],
                               benign=benign, epochs=client_epochs, config=config)
@@ -194,7 +238,7 @@ def client_update(client, client_idcs, config, curr_round, global_net, local_acc
             continue
     weights, loss, train_acc = adversary_update.train(model=copy.deepcopy(global_net),
                                                       lr=learning_rate,
-                                                      decay=decay)
+                                                      decay=decay, round_adversary_num=round_adversary_num)
     local_weights.append(copy.deepcopy(weights))
     local_loss.append(loss)
     local_acc.append(train_acc)

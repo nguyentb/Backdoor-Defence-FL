@@ -66,7 +66,7 @@ class Client:
         self.local_model = to_device(resnet_18(), device)
         self.config = config
 
-    def train(self, model, lr, decay):
+    def train(self, model, lr, decay, round_adversary_num):
         for name, param in model.state_dict().items():
             self.local_model.state_dict()[name].copy_(param.clone())
 
@@ -137,16 +137,17 @@ class Client:
             accuracy = 100.0 * (float(correct) / float(dataset_size))
             acc.append(accuracy)
 
-        difference = self.calculate_difference(model)
+        difference = self.calculate_difference(model, round_adversary_num)
 
         total_loss = sum(e_loss) / len(e_loss)
         accuracy = sum(acc) / len(acc)
         return difference, total_loss, accuracy
 
-    def calculate_difference(self, model):
+    def calculate_difference(self, model, round_adversary_num):
         difference = {}
         if not self.benign:
             scale = self.config["total_clients"] / self.config["global_lr"]
+            scale = scale / round_adversary_num
             print("Attacker scaling by", str(scale))
             for name, param in self.local_model.state_dict().items():
                 difference[name] = scale * (param - model.state_dict()[name]) + model.state_dict()[name]
