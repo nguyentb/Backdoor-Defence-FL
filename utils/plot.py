@@ -1,3 +1,5 @@
+import json
+
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -228,8 +230,28 @@ results = dict(train_loss=[], test_loss=[],
 results["test_accuracy"] = resultsa["test_accuracy"][:-50] + results["test_accuracy"]
 results["backdoor_test_accuracy"] = resultsa["backdoor_test_accuracy"][:-50] + results["backdoor_test_accuracy"]
 
+
+results = {"train_loss": [], "test_loss": [], "test_accuracy": [89.35, 90.54, 89.69, 90.92, 91.76, 91.23, 92.63, 91.99, 87.92, 91.89, 91.7, 94.0, 91.93, 93.19, 93.55, 93.42, 94.66, 91.98, 94.61, 94.63, 94.46, 94.51, 92.7, 93.04, 95.05, 94.93, 94.15, 94.62, 94.54, 93.87, 94.87], "train_accuracy": [0.8030840158462524, 0.3184318542480469, 0.1893938183784485, 0.12647481262683868, 0.12531884014606476, 0.13286365568637848, 0.8783217668533325, 0.7822795510292053, 0.9831924438476562, 1.1554454565048218, 1.2843886613845825, 1.0984984636306763, 1.2247064113616943, 1.44542396068573, 1.6534379720687866, 1.8000789880752563, 1.6048825979232788, 1.6048246622085571, 1.5776978731155396, 2.092711925506592, 1.9381765127182007, 2.1555047035217285, 2.111743211746216, 2.0905330181121826, 1.9849823713302612, 2.1059699058532715, 2.0701630115509033, 2.078183650970459, 2.33955454826355, 2.2212789058685303, 2.5649008750915527], "backdoor_test_loss": [], "backdoor_test_accuracy": [12.54, 42.03, 50.85, 51.37, 64.79, 37.12, 41.21, 23.46, 33.09, 27.85, 48.5, 23.16, 29.93, 15.14, 18.2, 19.01, 11.36, 17.43, 12.39, 12.06, 13.48, 16.93, 20.42, 11.2, 14.47, 12.67, 9.63, 13.37, 10.6, 9.55, 11.19]}
+
+
+results = {"test_accuracy": [91.58 ,92.83 ,89.17 ,93.05 ,92.66 ,91.18 ,92.96 ,93.3 ,93.66 ,93.76 ,90.54], "backdoor_test_accuracy": [ 16.56,36.18,60.44,25.06,16.15,16.71 ,39.9 ,45.47 ,49.36 ,51.78 ,26.27]}
+
+
+results={"test_accuracy": [90.62,91.72,90.63,90.73,90.33,89.6,90.44,90.65,91.95,89.93,90.95,91.65,92.15,92.53,92.82,89.26,90.45,91.12,91.59,92.45,92.94,93.28], "backdoor_test_accuracy": [27.93,38.2,14.86,26.48,15.07,27.07,27.56,18.77,18.24,15.43,15.6,15.62,15.92,16.15,16.13,7.33,7.98,8.61,11.91,11.99,12.18,12.43]}
+
+results={"test_accuracy":[83.58,81.62,82.53,87.27,88.72,85.74,90.05,91.77,92.45,93.13]
+, "backdoor_test_accuracy":[8.48,28.0,29.04,25.02,18.34,6.95,17.73,32.67,33.97,12.88]
+ }
+
+
+# results = {"test_accuracy": [86.3,83.0,90.16,89.39,87.86,93.69,92.74,93.59,92.02,90.51,89.91,90.08,94.51,94.56,94.83,93.1,94.09,93.69,94.59,93.61,93.84,92.67,93.28,93.71,93.01,93.94,93.74,92.01,94.89], "backdoor_test_accuracy": [8.03,30.98,14.5,37.81,15.71,22.61,26.02,35.65,33.13,21.19,23.25,47.65,28.91,43.4,18.23,33.16,39.17,25.78,15.09,36.18,16.14,20.11,19.92,26.8,28.0,29.08,13.74,9.66,20.96]}
+results = json.load(open("..\cifa_train_3.txt"))
+
+
 all = {"_without_attack": results}
-plt.rcParams.update({'font.size': 8})
+
+
+plt.rcParams.update({'font.size': 12})
 ax = plt.subplot()
 
 rounds = len(all["_without_attack"]["test_accuracy"])
@@ -239,8 +261,8 @@ print(rounds)
 x_axis = np.arange(1, rounds + 1)
 i = 0
 colours = {"test_accuracy_without_attack": "g",
-           "test_accuracy_with_attack": "b",
-           "backdoor_accuracy": "r"}
+           "test accuracy": "b",
+           "backdoor accuracy": "r"}
 
 for results in all.keys():
     for metric in all[results].keys():
@@ -248,16 +270,30 @@ for results in all.keys():
         if len(values) > 0 and "accuracy" in metric and "train" not in metric:
             label = metric + results
             if "backdoor" in metric:
-                label = "backdoor_accuracy"
+                label = "backdoor accuracy"
+            else:
+                label = "test accuracy"
             y_axis = np.array(values)
             ax.plot(x_axis, y_axis, colours[label], label=label)
 
             i += 1
-    ax.legend(loc='lower right')
-    ax.set(xlabel='Number of Rounds', ylabel='Accuracy')
+
+    ax.set(xlabel='Number of Rounds after convergence', ylabel='Accuracy')
 ax.grid()
 ax.set_yticks([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
 # ax.set_xticks([0,10,20,30,40,50,60,70,80,90,100, 110])
 
-plt.title("Accuracy for the Blood Cell dataset")
+# ax.set_xticks(list(range(1,rounds+2,2)))
+
+for att in range(1, 30,2):
+    plt.axvline(x=att, color='orange', linestyle="dashed")
+
+plt.axvline(x=29, color='orange', linestyle="dashed", label="Attack occurred")
+
+# plt.axvline(x=14, color='purple', linestyle="dashed", label="All attackers were removed.")
+ax.legend(loc='center left')
+# ax.legend(bbox_to_anchor=(1, 0.7))
+# ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.1),shadow=True, ncol=5)
+
+plt.title("Accuracy for the CIFAR10 dataset.")
 plt.show()
