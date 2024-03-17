@@ -369,8 +369,12 @@ def apply_defense(rounds, model, imgs_tes, images_list, labels_list, unlloader, 
     return poisoned
 
 
-def clean_model(model, device, test_set, results=None, init=False):
-    args = {'batch_size': 100, 'optim': 'Adam', 'lr': 0.004, 'K': 5, "lr_outer": 10}
+def clean_model(model, device, test_set, dataset, results=None, init=False):
+
+    if dataset == "CIFAR10":
+        args = {'batch_size': 100, 'optim': 'Adam', 'lr': 0.004, 'K': 5, "lr_outer": 10}
+    elif dataset == "blood cell":
+        args = {'batch_size': 100, 'optim': 'Adam', 'lr': 0.0001, 'K': 5, "lr_outer": 10}
 
     test_set, unl_set = get_eval_data(test_set)
 

@@ -362,26 +362,87 @@ one_attacker_every_round_after_convergence = {"attack_rounds": [1,2,3,4,5,6],"re
 
 one_attacker_every_ten_round_after_convergence = {"attack_rounds": [10,20],"removed_round":[], "train_loss": [], "test_loss": [], "test_accuracy": [81.01, 82.05, 82.99, 83.51, 89.16, 89.63, 89.95, 90.21, 90.32, 91.35, 90.38, 89.11, 90.32, 91.4, 92.32, 92.89, 91.7, 92.99, 93.33, 93.75, 89.97], "train_accuracy": [0.6782156229019165, 0.9384906888008118, 1.1048625707626343, 1.037558913230896, 0.8016201257705688, 0.9252390265464783, 1.22040593624115, 0.8481127619743347, 0.8325111269950867, 0.5716776251792908, 0.8733892440795898, 0.8127592206001282, 1.008501648902893, 1.0047972202301025, 0.8765735030174255, 0.9051495790481567, 0.9038848876953125, 1.0559004545211792, 1.4947232007980347, 1.281781792640686, 1.395781397819519], "backdoor_test_loss": [], "backdoor_test_accuracy": [7.66, 7.23, 7.42, 7.36, 13.17, 12.95, 12.79, 12.75, 12.9, 16.16, 22.51, 13.91, 14.61, 15.55, 16.39, 16.62, 23.09, 18.39, 18.25, 18.18, 20.64]}
 
-# all = {"_without_attack": results}
 
-all = base_acc_cifar_and_every_ten
-plt.rcParams.update({'font.size': 12})
-ax = plt.subplot()
 
-rounds = len(all["_without_attack"]["test_accuracy"])
+# all = base_acc_cifar_and_every_ten
 
-print(rounds)
+one_attacker_defense_every_ten = {
+               "test_accuracy_after": [], "test_accuracy_before": [],
+
+               "backdoor_test_accuracy_after": [],"backdoor_test_accuracy_before": [],
+
+               "remove": [],
+                "attack_rounds":[],
+
+               "unsure": [],
+               "correct": [],
+               "incorrect": [],
+
+               "avg": [],
+               "conv_avg": []
+               }
+
+before = True
+with open("..\\unsaved_results.txt") as file:
+    for line in file:
+        if "Start Round" in line:
+            round = line.split(" ")[2].strip()
+        if "BACKDOOR" in line:
+            print("before", before)
+            number = line.split(":")[1].strip()
+            print(number)
+            if before:
+                one_attacker_defense_every_ten["backdoor_test_accuracy_before"].append(float(number))
+
+            else:
+                one_attacker_defense_every_ten["backdoor_test_accuracy_after"].append(float(number))
+
+        if "MAIN ACCURACY:" in line:
+            number = line.split(":")[1].strip()
+            print(number)
+            if before:
+                before = False
+                one_attacker_defense_every_ten["test_accuracy_before"].append(float(number))
+
+            else:
+                before = True
+                one_attacker_defense_every_ten["test_accuracy_after"].append(float(number))
+
+        if "carrying out attack" in line:
+            one_attacker_defense_every_ten["attack_rounds"].append(int(round)-99)
 
 # rounds = len(all["_without_attack"]["train_accuracy"])
 #
 # print(rounds)
 
+results=one_attacker_defense_every_ten
+all = {"_with_attack": results}
+
+plt.rcParams.update({'font.size': 12})
+ax = plt.subplot()
+all["_with_attack"]["test_accuracy_before"].pop(0)
+all["_with_attack"]["backdoor_test_accuracy_before"].pop(0)
+rounds = len(all["_with_attack"]["test_accuracy_before"])
+
+print(rounds)
+
 x_axis = np.arange(1, rounds + 1)
 i = 0
 colours = {"test accuracy without attack": "b",
-           "test accuracy with attack": "g",
-           "backdoor accuracy": "r",
+           "test accuracy before": "g",
+           "backdoor accuracy before": "r",
+           "test accuracy after": "yellowgreen",
+           "backdoor accuracy after": "hotpink",
            "train accuracy": "purple"}
+
+
+for att in results["attack_rounds"][:-1]:
+    plt.axvline(x=int(att), color='orange', linestyle="dashed")
+
+plt.axvline(x=int(results["attack_rounds"][-1]), color='orange', linestyle="dashed", label="Attack occurred")
+
+# plt.axvline(x=int(results["removed_round"][0]), color='purple', linestyle="dashed", label="All attackers were removed.")
+
 
 for result in all.keys():
     for metric in all[result].keys():
@@ -389,37 +450,49 @@ for result in all.keys():
         if len(values) > 0 and "accuracy" in metric and "train" not in metric:
             label = metric + result
             if "backdoor" in metric:
-                label = "backdoor accuracy"
+                label = "backdoor accuracy before"
+                if "after" in metric:
+                    label = "backdoor accuracy after"
 
             elif "without" in result:
-                label= "test accuracy without attack"
+                label= "test accuracy"
 
             # elif "train" in metric:
             #     label = "train accuracy"
             else:
-                label = "test accuracy with attack"
+                label = "test accuracy before"
+                if "after" in metric:
+                    label = "test accuracy after"
             y_axis = np.array(values)
-            ax.plot(x_axis, y_axis, colours[label], label=label)
+            ax.plot(x_axis, y_axis, colours[label], label=label.capitalize(), linestyle="",marker="o")
 
             i += 1
 
-    ax.set(xlabel='Training epoch', ylabel='Accuracy (%)')
+    ax.set(xlabel='Number of communication rounds after convergence', ylabel='Accuracy (%)', )
     # ax.set(xlabel='Number of Rounds after convergence', ylabel='Accuracy (%)')
 ax.grid()
 ax.set_yticks([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
 # ax.set_xticks([0,10,20,30,40,50,60,70,80,90,100, 110])
 
-# ax.set_xticks(list(range(1,rounds+2,2)))
+box = ax.get_position()
+ax.set_position([box.x0, box.y0 + box.height * 0.1,
+                 box.width, box.height * 0.9])
+
+# Put a legend below current axis
+# ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
+#           fancybox=True, shadow=True, ncol=5)
+
+
+ax.set_xticks(list(range(1,rounds,10)) + [40])
 # print(results)
-# for att in results["attack_rounds"][:-2]:
-#     plt.axvline(x=int(att), color='orange', linestyle="dashed")
-#
-# plt.axvline(x=int(results["attack_rounds"][-2]), color='orange', linestyle="dashed", label="Attack occurred.")
-#
-# plt.axvline(x=int(results["removed_round"][0]), color='purple', linestyle="dashed", label="All attackers were removed.")
-ax.legend(loc='lower right')
+plt.legend(bbox_to_anchor=(1.04, 0), loc="lower left", borderaxespad=0)
+plt.subplots_adjust(right=0.7)
+# ax.legend(loc='lower right')
 # ax.legend(bbox_to_anchor=(1, 0.7))
 # ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.1),shadow=True, ncol=5)
 
-plt.title("Attack every ten rounds using CIFAR10.")
+plt.title("Backdoor and main task accuracy before and after applying defence.")
+
+matplotlib.rcParams.update({'font.size': 22})
+
 plt.show()

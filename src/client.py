@@ -66,7 +66,7 @@ class Client:
         self.local_model = to_device(resnet_18(), device)
         self.config = config
 
-    def train(self, model, lr, decay, round_adversary_num):
+    def train(self, model, lr, decay, round_adversary_num, set_scheduler):
         for name, param in model.state_dict().items():
             self.local_model.state_dict()[name].copy_(param.clone())
 
@@ -79,7 +79,7 @@ class Client:
             optimizer = torch.optim.SGD(self.local_model.parameters(), lr=lr, momentum=self.config["momentum"],
                                         weight_decay=decay)
 
-        if self.config["scheduler"]:
+        if set_scheduler:
             scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min')
 
 
@@ -128,7 +128,7 @@ class Client:
                 pred = output.data.max(1)[1]  # get the index of the max log-probability
                 correct += pred.eq(labels.data.view_as(pred)).cpu().sum().item()
 
-                if self.config["scheduler"]:
+                if set_scheduler:
                     scheduler.step(train_loss)
 
             # average losses

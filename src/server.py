@@ -88,6 +88,25 @@ def server_train(attack, global_net, config, client_idcs):
     if attack:
         adversary_num = 1
 
+    if config["dataset"] == "blood cell":
+        print("Setting params for blood cell")
+        benign_learning_rate = 0.01
+        benign_decay = 0.005
+
+        attacker_learning_rate = 0.01
+        attacker_decay = 0.0005
+        scheduler = False
+
+    else:
+        if config["dataset"] != "CIFAR10":
+            print("WARNING!")
+            print("Dataset specified not implemented. Using CIFAR10 instead.")
+
+        benign_learning_rate = 0
+        benign_decay = 0
+        attacker_learning_rate = 0
+        attacker_decay = 0
+
     results = {"train_loss_after": [], "train_loss_before": [],
                "test_loss_before": [], "test_loss_after": [],
                "test_accuracy_after": [], "test_accuracy_before": [],
@@ -121,9 +140,14 @@ def server_train(attack, global_net, config, client_idcs):
     print("Benign clients: ", benign_clients)
     print("Adversaries: ", adversaries)
 
-    for curr_round in range(1, config["rounds"] + 1):
-        attack_condition = (curr_round >= config["poisoning_epoch"]) and (curr_round % 2 == 0)
+    for curr_round in range(config["start_round"], config["rounds"] + 1):
+        attack_condition = (curr_round >= config["poisoning_epoch"]) and (curr_round % 2 == 0) and attack
         # attack_condition = True
+        if attack_condition:
+            print("Changing params to adapt to attack")
+            benign_learning_rate = 0.05
+            benign_decay = 0.005
+            scheduler = False
 
         m = max(config["total_clients"] * config["client_num_proportion"], 1)
         print("Choosing", m, "clients.")
@@ -140,21 +164,15 @@ def server_train(attack, global_net, config, client_idcs):
                 m = m - 1
                 print("carrying out attack")
                 client_update(adversary, client_idcs, config, curr_round, global_net, local_acc, local_loss,
-                              local_weights, weight_accumulator, config["attacker_decay"],
-                              config["attacker_learning_rate"], config["attacker_epochs"], False, round_adversary_num)
+                              local_weights, weight_accumulator, attacker_decay,
+                              attacker_learning_rate, config["attacker_epochs"], False, round_adversary_num, scheduler)
 
         clients = list(np.random.choice(benign_clients, int(m), replace=False))
         for client in clients:
-            # learning_rate = config["benign_learning_rate"]
-            # for i in range(len(config["lr_decrease_epochs"])):
-            #     if curr_round > config["lr_decrease_epochs"][i]:
-            #         learning_rate *= 0.5
-            #     else:
-            #         continue
 
             client_update(client, client_idcs, config, curr_round, global_net, local_acc, local_loss,
-                          local_weights, weight_accumulator, config["benign_decay"], config["benign_learning_rate"],
-                          config["benign_epochs"], True, round_adversary_num)
+                          local_weights, weight_accumulator, benign_decay, benign_learning_rate,
+                          config["benign_epochs"], True, round_adversary_num, scheduler)
 
         model_aggregate(weight_accumulator=weight_accumulator, global_model=global_net, conf=config)
 
@@ -171,12 +189,11 @@ def server_train(attack, global_net, config, client_idcs):
 
 def apply_defence(adversaries, attack, attack_condition, backdoor_t_accuracy, benign_clients, best_accuracy,
                   client_tags, clients, config, curr_round, device, global_net, local_acc, local_loss, results):
-
     state_before = copy.deepcopy(global_net.state_dict())
     test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, global_net, results, local_acc,
                           local_loss, "before")
 
-    poisoned = defense.clean_model(global_net, device, test_dataset, results)
+    poisoned = defense.clean_model(global_net, device, test_dataset, config["dataset"], results)
 
     if poisoned == 0:
         if not attack_condition or len(adversaries) == 0:
@@ -260,7 +277,7 @@ def test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, gl
 
 
 def client_update(client, client_idcs, config, curr_round, global_net, local_acc, local_loss, local_weights,
-                  weight_accumulator, decay, learning_rate, client_epochs, benign, round_adversary_num):
+                  weight_accumulator, decay, learning_rate, client_epochs, benign, round_adversary_num, scheduler):
     adversary_update = Client(dataset=train_dataset, batch_size=config["batch_size"],
                               client_id=client_idcs[client],
                               benign=benign, epochs=client_epochs, config=config)
@@ -272,7 +289,7 @@ def client_update(client, client_idcs, config, curr_round, global_net, local_acc
             continue
     weights, loss, train_acc = adversary_update.train(model=copy.deepcopy(global_net),
                                                       lr=learning_rate,
-                                                      decay=decay, round_adversary_num=round_adversary_num)
+                                                      decay=decay, round_adversary_num=round_adversary_num, set_scheduler=scheduler)
     local_weights.append(copy.deepcopy(weights))
     local_loss.append(loss)
     local_acc.append(train_acc)
