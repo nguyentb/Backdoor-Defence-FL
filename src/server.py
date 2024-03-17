@@ -37,8 +37,9 @@ def detect_attackers(client_tags, clients, adversaries):
     print()
 
 
-def remove_from_training(tagged_client, benign_clients, adversaries, client_tags):
+def remove_from_training(tagged_client, benign_clients, adversaries, client_tags, results, curr_round):
     print("removing client", tagged_client, "from training, as they were tagged over the threshold.")
+    results["remove"].append(curr_round)
 
     if tagged_client in benign_clients:
         benign_clients.remove(tagged_client)
@@ -51,10 +52,10 @@ def remove_from_training(tagged_client, benign_clients, adversaries, client_tags
     else:
         print("Error: client was not found in list")
 
-    return  benign_clients, adversaries
+    return benign_clients, adversaries
 
 
-def remove_attackers(client_tags, benign_clients, adversaries):
+def remove_attackers(client_tags, benign_clients, adversaries, results, curr_round):
     print()
     highest_clients = []
     max = list(client_tags.values())[0]
@@ -64,35 +65,47 @@ def remove_attackers(client_tags, benign_clients, adversaries):
         tag_num = prev_tags[tagged_client]
         print(str(tagged_client), "has", str(tag_num), "votes.")
 
-        if tag_num ==  max:
+        if tag_num == max:
             highest_clients.append(tagged_client)
         elif tag_num > max:
             highest_clients = [tagged_client]
 
         # remove all clients that have appeared more than threshold
         if tag_num > 5:
-             benign_clients, adversaries = remove_from_training(tagged_client, benign_clients, adversaries, client_tags)
+            benign_clients, adversaries = remove_from_training(tagged_client, benign_clients, adversaries, client_tags,
+                                                               results, curr_round)
 
     if len(highest_clients) == 1:
-        benign_clients, adversaries = remove_from_training(highest_clients[0], benign_clients, adversaries,client_tags)
+        benign_clients, adversaries = remove_from_training(highest_clients[0], benign_clients, adversaries, client_tags,
+                                                           results, curr_round)
 
     print()
     return benign_clients, adversaries
+
 
 def server_train(attack, global_net, config, client_idcs):
     adversary_num = 0
     if attack:
         adversary_num = 1
 
-    results = {"train_loss": [],
-               "test_loss": [],
-               "test_accuracy": [],
-               "train_accuracy": [],
-               "backdoor_test_loss": [],
-               "backdoor_test_accuracy": []}
+    results = {"train_loss_after": [], "train_loss_before": [],
+               "test_loss_before": [], "test_loss_after": [],
+               "test_accuracy_after": [], "test_accuracy_before": [],
+               "train_accuracy_after": [], "train_accuracy_before": [],
 
-    if config["preload_model"]:
-        results = json.load(open("logs/"+config["preload_model_name"]+".txt"))
+               "backdoor_test_loss_after": [], "backdoor_test_loss_before": [],
+               "backdoor_test_accuracy_before": [],
+               "backdoor_test_accuracy_after": [],
+               "remove": [],
+               "unsure": [],
+               "correct": [],
+               "incorrect": [],
+               "avg": [],
+               "conv_avg": []
+               }
+
+    if config["load_results"]:
+        results = json.load(open("logs/" + config["preload_model_name"] + ".txt"))
 
     best_accuracy = 0
     backdoor_t_accuracy = 0
@@ -109,8 +122,8 @@ def server_train(attack, global_net, config, client_idcs):
     print("Adversaries: ", adversaries)
 
     for curr_round in range(1, config["rounds"] + 1):
-        # attack_condition = config["poisoning_epoch"]
-        attack_condition = True
+        attack_condition = (curr_round >= config["poisoning_epoch"]) and (curr_round % 2 == 0)
+        # attack_condition = True
 
         m = max(config["total_clients"] * config["client_num_proportion"], 1)
         print("Choosing", m, "clients.")
@@ -141,77 +154,98 @@ def server_train(attack, global_net, config, client_idcs):
 
             client_update(client, client_idcs, config, curr_round, global_net, local_acc, local_loss,
                           local_weights, weight_accumulator, config["benign_decay"], config["benign_learning_rate"],
-                          config["benign_epochs"], True)
+                          config["benign_epochs"], True, round_adversary_num)
 
         model_aggregate(weight_accumulator=weight_accumulator, global_model=global_net, conf=config)
 
-        state_before = copy.deepcopy(global_net.state_dict())
-        poisoned = defense.clean_model(global_net, device)
-
-        if poisoned == 0:
-            if not attack_condition or len(adversaries) == 0:
-                print("Server CORRECTLY believes model was clean.")
-
-            else:
-                print("Server INCORRECTLY believes model was clean.")
-
-            global_net.load_state_dict(state_before)
-
-        elif poisoned == 1:
-            print()
-            print("Server received notice that model was poisoned")
-
-            if attack_condition and len(adversaries) > 0:
-                print("Attack was correctly detected.")
-
-            else:
-                print("Attack was incorrectly detected.")
-
-            detect_attackers(client_tags, clients, adversaries)
-            benign_clients, adversaries = remove_attackers(client_tags, benign_clients, adversaries)
-
-            if not adversaries:
-                print("All adversaries have been removed.")
-                adversaries = []
-
-        elif not attack_condition or len(adversaries) == 0:
-            print("Model was not poisoned and model was not sure.")
-
-        elif attack_condition:
-            print("Model was poisoned and model was not sure.")
+        if config["carry_defence"]:
+            adversaries, benign_clients = apply_defence(adversaries, attack, attack_condition, backdoor_t_accuracy,
+                                                        benign_clients, best_accuracy, client_tags, clients, config,
+                                                        curr_round, device, global_net, local_acc, local_loss, results)
 
         test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, global_net, results, local_acc,
-                              local_loss)
+                              local_loss, "after")
 
         save_model(config, curr_round, global_net)
 
 
+def apply_defence(adversaries, attack, attack_condition, backdoor_t_accuracy, benign_clients, best_accuracy,
+                  client_tags, clients, config, curr_round, device, global_net, local_acc, local_loss, results):
+
+    state_before = copy.deepcopy(global_net.state_dict())
+    test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, global_net, results, local_acc,
+                          local_loss, "before")
+
+    poisoned = defense.clean_model(global_net, device, test_dataset, results)
+
+    if poisoned == 0:
+        if not attack_condition or len(adversaries) == 0:
+            print("Server CORRECTLY believes model was clean.")
+            results["correct"].append(curr_round)
+
+        else:
+            print("Server INCORRECTLY believes model was clean.")
+            results["incorrect"].append(curr_round)
+
+        global_net.load_state_dict(state_before)
+
+    elif poisoned == 1:
+        print()
+        print("Server received notice that model was poisoned")
+
+        if attack_condition and len(adversaries) > 0:
+            print("Attack was correctly detected.")
+            results["correct"].append(curr_round)
+
+        else:
+            print("Attack was incorrectly detected.")
+            results["incorrect"].append(curr_round)
+
+        detect_attackers(client_tags, clients, adversaries)
+        benign_clients, adversaries = remove_attackers(client_tags, benign_clients, adversaries, results,
+                                                       curr_round)
+
+        if not adversaries:
+            print("All adversaries have been removed.")
+            adversaries = []
+
+    elif not attack_condition or len(adversaries) == 0:
+        results["unsure"].append(curr_round)
+        print("Model was not poisoned and model was not sure.")
+
+    elif attack_condition:
+        results["unsure"].append(curr_round)
+        print("Model was poisoned and model was not sure.")
+
+    return adversaries, benign_clients
+
+
 def save_model(config, curr_round, global_net):
     if curr_round < config["poisoning_epoch"]:
-        torch.save(global_net.state_dict(), "pretrained_models/"+config["log_file"]+"_no_attack.pt")
+        torch.save(global_net.state_dict(), "pretrained_models/" + config["log_file"] + "_no_attack.pt")
         # open("results_from_beginning.txt", 'w').write(json.dumps(results))
 
     else:
-        torch.save(global_net.state_dict(), "pretrained_models/"+config["log_file"]+".pt")
+        torch.save(global_net.state_dict(), "pretrained_models/" + config["log_file"] + ".pt")
 
 
 def test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, global_net, results, local_acc,
-                          local_loss):
+                          local_loss, time):
     train_acc = sum(local_acc) / len(local_acc)
     train_loss = sum(local_loss) / len(local_loss)
-    results["train_accuracy"].append(train_acc)
-    results["train_loss"].append(train_loss.item())
+    results["train_accuracy_" + time].append(train_acc)
+    results["train_loss_" + time].append(train_loss.item())
 
-    t_accuracy, t_loss = testing(global_net, test_dataset)
-    results["test_accuracy"].append(t_accuracy)
-    results["test_loss"].append(t_loss)
+    t_accuracy = defense.testing(global_net, test_dataset)
+    results["test_accuracy_" + time].append(t_accuracy)
+    # results["test_loss_" + time].append(t_loss)
 
     print("Finished benign test")
 
     if attack:
-        backdoor_t_accuracy, backdoor_t_loss = poisoned_testing(global_net, test_dataset, config["poisoning_label"])
-        results["backdoor_test_accuracy"].append(backdoor_t_accuracy)
-        results["backdoor_test_loss"].append(backdoor_t_loss)
+        backdoor_t_accuracy = defense.poisoned_testing(global_net, test_dataset)
+        results["backdoor_test_accuracy_" + time].append(backdoor_t_accuracy)
+        # results["backdoor_test_loss_" + time].append(backdoor_t_loss)
 
     if best_accuracy < t_accuracy:
         best_accuracy = t_accuracy
@@ -222,7 +256,7 @@ def test_aggregated_model(attack, backdoor_t_accuracy, best_accuracy, config, gl
     print("MAIN ACCURACY:", t_accuracy)
     print()
 
-    open("logs/"+config["log_file"]+".txt", 'w').write(json.dumps(results))
+    open("logs/" + config["log_file"] + ".txt", 'w').write(json.dumps(results))
 
 
 def client_update(client, client_idcs, config, curr_round, global_net, local_acc, local_loss, local_weights,
@@ -245,39 +279,3 @@ def client_update(client, client_idcs, config, curr_round, global_net, local_acc
 
     for name, params in global_net.state_dict().items():
         weight_accumulator[name].add_(weights[name])
-
-
-def testing(model, dataset, poisoning_label=None):
-    model.eval()
-    loss_function = torch.nn.CrossEntropyLoss()
-    test_loader = DataLoader(dataset, batch_size=4)
-    loss_sum = 0
-    correct_num = 0
-    sample_num = 0
-
-    pos = initialise_trigger_arr()
-
-    for imgs, labels in test_loader:
-        if poisoning_label is not None:
-            labels, imgs = inject_trigger(imgs, labels, poisoning_label, pos, len(imgs))
-
-        if torch.cuda.is_available():
-            imgs, labels = imgs.cuda(), labels.cuda()
-
-        output = model(imgs)
-
-        loss = loss_function(output, labels)
-        loss_sum += loss.item()
-
-        prediction = torch.max(output, 1)
-
-        correct_num += (labels == prediction[1]).sum().item()
-        sample_num += labels.shape[0]
-
-    accuracy = 100 * correct_num / sample_num
-
-    return accuracy, loss_sum
-
-
-def poisoned_testing(model, dataset, poisoning_label):
-    return testing(model, dataset, poisoning_label=poisoning_label)

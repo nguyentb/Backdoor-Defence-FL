@@ -3,7 +3,8 @@ import yaml
 import numpy as np
 from preprocess_dataset import train_dataset, test_dataset, train_labels
 import warnings
-from server import server_train, testing
+from server import server_train
+from defense import testing
 from client import to_device, resnet_18, device, classes
 
 warnings.filterwarnings("ignore")

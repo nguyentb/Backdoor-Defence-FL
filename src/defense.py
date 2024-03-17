@@ -1,19 +1,17 @@
+import json
 from collections.abc import Iterable
 import math
 import copy
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import matplotlib
 import statistics
 from torch.utils.data import TensorDataset, DataLoader, random_split
 import random
-import matplotlib.pyplot as plt
 import numpy as np
 from torchvision.models import resnet18
 from torchvision.transforms import transforms
 import hypergrad as hg
-from torchvision.datasets import CIFAR10
 from numpy.linalg import norm
 
 
@@ -120,11 +118,11 @@ def calc_diff(new_model, old_model):
         # print("MEDIAN OF DIFFERENCES:", str(statistics.median(differences)))
         # print("STANDARD DEVIATION OF DIFFERENCES:", str(statistics.stdev(differences)))
         try:
-          print(str(avg))
-          print(str(statistics.median(differences)))
-          print(str(statistics.stdev(differences)))
+            print(str(avg))
+            print(str(statistics.median(differences)))
+            print(str(statistics.stdev(differences)))
         except ValueError:
-          print("There was no change in the model.")
+            print("There was no change in the model.")
 
     return avg
 
@@ -164,6 +162,7 @@ def calc_dist(new_model, old_model):
         print(output[0][0].item())
         print(hamming[0][0].item())
 
+
 # def flatten_comprehension(matrix):
 #     return [item for row in matrix for item in row]
 
@@ -175,8 +174,9 @@ def flatten_comprehension(xs):
             yield x
 
 
-def calculate_difference(model, old_model, test_set):
+def calculate_difference(model, old_model, test_set, results):
     # print("CALCULATING DIFFERENCES ")
+
     avg = calc_diff(copy.deepcopy(model), copy.deepcopy(old_model))
     calc_dist(copy.deepcopy(model), copy.deepcopy(old_model))
 
@@ -221,24 +221,28 @@ def calculate_difference(model, old_model, test_set):
             # print("==================")
 
             # print("==================")
-            print( str(sum(layer_d) / len(layer_d)))
-            print( str(statistics.median(layer_d)))
-            print( str(statistics.stdev(layer_d)))
+            print(str(sum(layer_d) / len(layer_d)))
+            print(str(statistics.median(layer_d)))
+            print(str(statistics.stdev(layer_d)))
 
             print(str(conv_avg))
             print(str(statistics.median(conv)))
-            print( str(conv_dev))
+            print(str(conv_dev))
 
-            print( str(sum(bn2) / len(bn2)))
+            print(str(sum(bn2) / len(bn2)))
             print(str(statistics.median(bn2)))
             print(str(statistics.stdev(bn2)))
+
+            if results is not None:
+                results["conv_avg"].append(conv_avg)
+                results["avg"].append(avg)
             # print("==================")
         except ValueError:
             print("There was no difference in model.")
 
     model = copy.deepcopy(prev_model)
 
-    if conv_avg < -0.0065 or (conv_avg/avg)> 15 or (conv_avg/avg)< -4:
+    if conv_avg < -0.0065 or (conv_avg / avg) > 15 or (conv_avg / avg) < -4:
         print("MODEL WAS POISONED")
         return 1
 
@@ -251,23 +255,17 @@ def calculate_difference(model, old_model, test_set):
 
 
 def imshow(img, title="2"):
-    img = img.clamp(0, 1)
-    img = img.numpy()
-    plt.imshow(np.transpose(img, (1, 2, 0)))
-    plt.title(title)
-    plt.show()
+    pass
+    # img = img.clamp(0, 1)
+    # img = img.numpy()
+    # plt.imshow(np.transpose(img, (1, 2, 0)))
+    # plt.title(title)
+    # plt.show()
 
 
-def get_eval_data():
+def get_eval_data(test_set_o):
     mean, std = [0.4914, 0.4822, 0.4465], [0.247, 0.243, 0.261]
     IMAGE_SIZE = 32
-    composed_test = transforms.Compose([
-        transforms.Resize((IMAGE_SIZE, IMAGE_SIZE)),  # Resize the image in a 32X32 shape
-        transforms.ToTensor(),  # Converting image to tensor
-        transforms.Normalize(mean, std),
-        # Normalizing with standard mean and standard deviation
-    ])
-    test_set_o = CIFAR10('./', train=False, download=False, transform=composed_test)
 
     torch.manual_seed(43)
     val_size = math.floor(len(test_set_o) * 0.2)
@@ -289,7 +287,7 @@ def resnet_18():
 
 
 def apply_defense(rounds, model, imgs_tes, images_list, labels_list, unlloader, test_set,
-                  args, init, device):
+                  args, init, device, results):
     old_model = copy.deepcopy(model)
     print("apply defense")
     test_accuracy("BEFORE", copy.deepcopy(model), test_set)
@@ -298,8 +296,8 @@ def apply_defense(rounds, model, imgs_tes, images_list, labels_list, unlloader, 
         images = images_list[0]
         labels = labels_list[0].long()
         if torch.cuda.is_available():
-          images = images.cuda()
-          labels = labels.cuda()
+            images = images.cuda()
+            labels = labels.cuda()
         per_img = images + perturb[0]
         per_logits = model.forward(per_img)
         loss = F.cross_entropy(per_logits, labels, reduction='none')
@@ -362,7 +360,7 @@ def apply_defense(rounds, model, imgs_tes, images_list, labels_list, unlloader, 
         test_accuracy("AFTER", copy.deepcopy(model), test_set)
 
         if not repeated:
-            poisoned = calculate_difference(model, old_model, test_set)
+            poisoned = calculate_difference(model, old_model, test_set, results)
             if poisoned == 1:
                 print("repeating cleaning")
                 repeated = True
@@ -371,10 +369,10 @@ def apply_defense(rounds, model, imgs_tes, images_list, labels_list, unlloader, 
     return poisoned
 
 
-def clean_model(model, device, init=False):
+def clean_model(model, device, test_set, results=None, init=False):
     args = {'batch_size': 100, 'optim': 'Adam', 'lr': 0.004, 'K': 5, "lr_outer": 10}
 
-    test_set, unl_set = get_eval_data()
+    test_set, unl_set = get_eval_data(test_set)
 
     tesloader = DataLoader(test_set, batch_size=1, shuffle=False, num_workers=1)
     dataiter = iter(tesloader)
@@ -389,6 +387,6 @@ def clean_model(model, device, init=False):
         labels_list.append(labels)
 
     return apply_defense(rounds=1, model=model, imgs_tes=imgs_tes, images_list=images_list,
-                  labels_list=labels_list, unlloader=unlloader,
-                  test_set=test_set, args=args, init=init, device=device)
+                         labels_list=labels_list, unlloader=unlloader,
+                         test_set=test_set, args=args, init=init, device=device, results=results)
 
