@@ -1,3 +1,4 @@
 # User manual 
-
-Describe how to use your software, if this makes sense for your code. Almost all projects should have at least some instructions on how to run the code. More extensive instructions can be provided here.
+The folder pretrained_models contains pre-trained models that can be used to test the code.
+In utils/params.yaml file, the name of the pre-trained model can be defined.
+The params.yaml file contains the settings which can be changed to test the code under different conditions.
