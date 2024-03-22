@@ -190,7 +190,8 @@ base_acc_cifar_and_every_ten = {"_without_attack": {"train_loss": [0.12528077843
                    0.04270644246126406, 0.03933881880711511, 0.036621864114661576, 0.03545134261049262,
                    0.038379858089246634, 0.03543607313125209, 0.042119076335594974, 0.041171170802667995,
                    0.040578116072739846, 0.03865072032548793, 0.03605181780279291, 0.0351914064417711,
-                   0.03696528720238351, 0.03825749001523422, 0.03471947890255819, 0.04046840616237553],"test_loss": [0.01873986346721649, 0.01795187518596649, 0.01749327528476715, 0.016612403535842896,
+                   0.03696528720238351, 0.03825749001523422, 0.03471947890255819, 0.04046840616237553],
+                                                    "test_loss": [0.01873986346721649, 0.01795187518596649, 0.01749327528476715, 0.016612403535842896,
                   0.015582855331897736, 0.01432559642791748, 0.012942187678813935, 0.01256927375793457,
                   0.011265034091472627, 0.011167864322662353, 0.010905730819702149, 0.00949214208126068,
                   0.009382576048374176, 0.008574830758571624, 0.007748222124576569, 0.008314536964893341,
@@ -214,14 +215,16 @@ base_acc_cifar_and_every_ten = {"_without_attack": {"train_loss": [0.12528077843
                   0.00492893428504467, 0.00498985185623169, 0.004698838165402413, 0.005327022671699524,
                   0.005103945708274841, 0.0047715742141008375, 0.004583150944113731, 0.00501425401866436,
                   0.004803160917758942, 0.005671905660629272, 0.0053308781206607815, 0.004617161110043525,
-                  0.004927958458662033, 0.005240088859200478, 0.005024097767472267, 0.0047650525718927386],"test_accuracy": [10.0, 12.67, 19.74, 30.4, 38.9, 36.86, 50.61, 51.05, 58.87, 53.23, 54.01, 61.76, 64.86, 65.93,
+                  0.004927958458662033, 0.005240088859200478, 0.005024097767472267, 0.0047650525718927386],
+                                                    "test_accuracy": [10.0, 12.67, 19.74, 30.4, 38.9, 36.86, 50.61, 51.05, 58.87, 53.23, 54.01, 61.76, 64.86, 65.93,
                       70.78, 68.64, 69.7, 69.49, 63.15, 64.43, 63.96, 69.55, 68.22, 69.17, 66.71, 75.92, 75.51, 75.8,
                       72.45, 72.09, 73.81, 74.61, 77.22, 67.26, 74.69, 72.06, 73.75, 74.42, 76.0, 76.9, 68.15, 73.12,
                       74.85, 75.17, 73.78, 78.2, 76.42, 74.36, 79.11, 79.0, 78.36, 77.91, 73.69, 75.35, 77.32, 78.06,
                       78.7, 78.12, 77.59, 74.95, 79.66, 77.59, 78.73, 79.79, 80.32, 76.25, 77.72, 76.39, 79.14, 79.51,
                       80.14, 79.01, 80.29, 79.23, 78.95, 76.36, 76.49, 80.58, 78.83, 80.57, 79.5, 80.38, 79.45, 78.83,
                       80.36, 79.33, 80.87, 78.75, 78.56, 80.38, 80.77, 80.05, 81.24, 74.79, 77.28, 80.96, 78.54, 77.39,
-                      78.46, 80.91],"train_accuracy": [20.513283932767035, 19.876009768927297, 22.812399095899256, 40.69789859263543, 45.11506730351715,
+                      78.46, 80.91],
+                                                    "train_accuracy": [20.513283932767035, 19.876009768927297, 22.812399095899256, 40.69789859263543, 45.11506730351715,
                        41.77855274629468, 56.50652985074627, 50.50161232533142, 63.66064092029581, 59.950903033491144,
                        62.43362831858407, 65.74340793263904, 72.23520249221184, 71.69601069757076, 74.27926798696416,
                        70.71970473651835, 71.25662994696043, 75.10340752412843, 70.39718659495242, 68.3348095659876,
@@ -353,26 +356,83 @@ one_attacker_every_round_after_conv={"test_accuracy": [90.62,91.72,90.63,90.73,9
 
 dk ={"test_accuracy":[83.58,81.62,82.53,87.27,88.72,85.74,90.05,91.77,92.45,93.13], "backdoor_test_accuracy":[8.48,28.0,29.04,25.02,18.34,6.95,17.73,32.67,33.97,12.88]}
 
-one_attacker_every_other_round = {"test_accuracy": [86.3,83.0,90.16,89.39,87.86,93.69,92.74,93.59,92.02,90.51,89.91,90.08,94.51,94.56,94.83,93.1,94.09,93.69,94.59,93.61,93.84,92.67,93.28,93.71,93.01,93.94,93.74,92.01,94.89], "backdoor_test_accuracy": [8.03,30.98,14.5,37.81,15.71,22.61,26.02,35.65,33.13,21.19,23.25,47.65,28.91,43.4,18.23,33.16,39.17,25.78,15.09,36.18,16.14,20.11,19.92,26.8,28.0,29.08,13.74,9.66,20.96]}
+one_attacker_every_other_round_defense_after_conv = {"test_accuracy": [86.3,83.0,90.16,89.39,87.86,93.69,92.74,93.59,92.02,90.51,89.91,90.08,94.51,94.56,94.83,93.1,94.09,93.69,94.59,93.61,93.84,92.67,93.28,93.71,93.01,93.94,93.74,92.01,94.89], "backdoor_test_accuracy": [8.03,30.98,14.5,37.81,15.71,22.61,26.02,35.65,33.13,21.19,23.25,47.65,28.91,43.4,18.23,33.16,39.17,25.78,15.09,36.18,16.14,20.11,19.92,26.8,28.0,29.08,13.74,9.66,20.96]}
 # results = json.load(open("..\cifa_train_3.txt"))
 
 # {"attack_rounds": [],"removed_round":[],"test_accuracy": , "backdoor_test_accuracy": }
 
-one_attacker_every_round_after_convergence = {"attack_rounds": [1,2,3,4,5,6],"removed_round":[6], "train_loss": [], "test_loss": [], "test_accuracy": [83.54, 86.68, 87.24, 87.06, 88.13, 87.59, 87.83, 88.11, 89.49, 88.78, 90.48, 92.99, 92.07, 89.74, 91.96, 92.61, 93.15, 93.43, 92.01, 87.45, 88.85, 93.69], "train_accuracy": [0.5648443102836609, 0.6208533644676208, 1.0328242778778076, 0.7345974445343018, 0.8370644450187683, 0.7032713890075684, 0.9350256323814392, 0.9031767845153809, 1.074091911315918, 0.968725860118866, 1.1291812658309937, 1.3827708959579468, 1.3432375192642212, 1.6041765213012695, 1.870017409324646, 1.6527187824249268, 1.5617035627365112, 1.9573827981948853, 1.7422571182250977, 1.5144652128219604, 1.8473056554794312, 1.544835090637207], "backdoor_test_loss": [], "backdoor_test_accuracy": [7.65, 34.16, 35.9, 34.03, 34.99, 19.07, 14.63, 34.58, 36.06, 24.66, 26.44, 35.63, 16.83, 41.23, 25.33, 26.53, 27.7, 28.55, 17.49, 19.78, 22.34, 45.54]}
+one_attacker_every_round_after_convergence_defense_cifar = {"attack_rounds": [1,2,3,4,5,6],"removed_round":[6], "train_loss": [], "test_loss": [], "test_accuracy": [83.54, 86.68, 87.24, 87.06, 88.13, 87.59, 87.83, 88.11, 89.49, 88.78, 90.48, 92.99, 92.07, 89.74, 91.96, 92.61, 93.15, 93.43, 92.01, 87.45, 88.85, 93.69], "train_accuracy": [0.5648443102836609, 0.6208533644676208, 1.0328242778778076, 0.7345974445343018, 0.8370644450187683, 0.7032713890075684, 0.9350256323814392, 0.9031767845153809, 1.074091911315918, 0.968725860118866, 1.1291812658309937, 1.3827708959579468, 1.3432375192642212, 1.6041765213012695, 1.870017409324646, 1.6527187824249268, 1.5617035627365112, 1.9573827981948853, 1.7422571182250977, 1.5144652128219604, 1.8473056554794312, 1.544835090637207], "backdoor_test_loss": [], "backdoor_test_accuracy": [7.65, 34.16, 35.9, 34.03, 34.99, 19.07, 14.63, 34.58, 36.06, 24.66, 26.44, 35.63, 16.83, 41.23, 25.33, 26.53, 27.7, 28.55, 17.49, 19.78, 22.34, 45.54]}
 
 one_attacker_every_ten_round_after_convergence = {"attack_rounds": [10,20],"removed_round":[], "train_loss": [], "test_loss": [], "test_accuracy": [81.01, 82.05, 82.99, 83.51, 89.16, 89.63, 89.95, 90.21, 90.32, 91.35, 90.38, 89.11, 90.32, 91.4, 92.32, 92.89, 91.7, 92.99, 93.33, 93.75, 89.97], "train_accuracy": [0.6782156229019165, 0.9384906888008118, 1.1048625707626343, 1.037558913230896, 0.8016201257705688, 0.9252390265464783, 1.22040593624115, 0.8481127619743347, 0.8325111269950867, 0.5716776251792908, 0.8733892440795898, 0.8127592206001282, 1.008501648902893, 1.0047972202301025, 0.8765735030174255, 0.9051495790481567, 0.9038848876953125, 1.0559004545211792, 1.4947232007980347, 1.281781792640686, 1.395781397819519], "backdoor_test_loss": [], "backdoor_test_accuracy": [7.66, 7.23, 7.42, 7.36, 13.17, 12.95, 12.79, 12.75, 12.9, 16.16, 22.51, 13.91, 14.61, 15.55, 16.39, 16.62, 23.09, 18.39, 18.25, 18.18, 20.64]}
 
 
-
 # all = base_acc_cifar_and_every_ten
 
-one_attacker_defense_every_ten = {
+# one_attacker_defense_every_ten = {
+#                "test_accuracy_after": [], "test_accuracy_before": [],
+#
+#                "backdoor_test_accuracy_after": [],"backdoor_test_accuracy_before": [],
+#
+#                "remove": [],
+#                 "attack_rounds":[],
+#
+#                "unsure": [],
+#                "correct": [],
+#                "incorrect": [],
+#
+#                "avg": [],
+#                "conv_avg": []
+#                }
+#
+# before = True
+# with open("..\\unsaved_results.txt") as file:
+#     for line in file:
+#         if "Start Round" in line:
+#             round = line.split(" ")[2].strip()
+#         if "BACKDOOR" in line:
+#             print("before", before)
+#             number = line.split(":")[1].strip()
+#             print(number)
+#             if before:
+#                 one_attacker_defense_every_ten["backdoor_test_accuracy_before"].append(float(number))
+#
+#             else:
+#                 one_attacker_defense_every_ten["backdoor_test_accuracy_after"].append(float(number))
+#
+#         if "MAIN ACCURACY:" in line:
+#             number = line.split(":")[1].strip()
+#             print(number)
+#             if before:
+#                 before = False
+#                 one_attacker_defense_every_ten["test_accuracy_before"].append(float(number))
+#
+#             else:
+#                 before = True
+#                 one_attacker_defense_every_ten["test_accuracy_after"].append(float(number))
+#
+#         if "carrying out attack" in line:
+#             one_attacker_defense_every_ten["attack_rounds"].append(int(round)-99)
+
+# rounds = len(all["_without_attack"]["train_accuracy"])
+#
+# print(rounds)
+
+# results= one_attacker_defense_every_ten
+#
+
+# all["_with_attack"]["test_accuracy_before"].pop(0)
+# all["_with_attack"]["backdoor_test_accuracy_before"].pop(0)
+
+
+results = json.load(open("..\\NO_DEFENCE_OneShot_decay_1_10_CIFAR"))
+
+pne_shot_cifar = {
                "test_accuracy_after": [], "test_accuracy_before": [],
 
                "backdoor_test_accuracy_after": [],"backdoor_test_accuracy_before": [],
 
                "remove": [],
-                "attack_rounds":[],
+                "attack_rounds":[1],
 
                "unsure": [],
                "correct": [],
@@ -383,7 +443,7 @@ one_attacker_defense_every_ten = {
                }
 
 before = True
-with open("..\\unsaved_results.txt") as file:
+with open("..\\one_shot_CIfar_decay") as file:
     for line in file:
         if "Start Round" in line:
             round = line.split(" ")[2].strip()
@@ -392,54 +452,92 @@ with open("..\\unsaved_results.txt") as file:
             number = line.split(":")[1].strip()
             print(number)
             if before:
-                one_attacker_defense_every_ten["backdoor_test_accuracy_before"].append(float(number))
+                pne_shot_cifar["backdoor_test_accuracy_before"].append(float(number))
 
             else:
-                one_attacker_defense_every_ten["backdoor_test_accuracy_after"].append(float(number))
+                pne_shot_cifar["backdoor_test_accuracy_after"].append(float(number))
 
         if "MAIN ACCURACY:" in line:
             number = line.split(":")[1].strip()
             print(number)
             if before:
-                before = False
-                one_attacker_defense_every_ten["test_accuracy_before"].append(float(number))
+                # before = False
+                pne_shot_cifar["test_accuracy_before"].append(float(number))
 
             else:
-                before = True
-                one_attacker_defense_every_ten["test_accuracy_after"].append(float(number))
+                # before = True
+                pne_shot_cifar["test_accuracy_after"].append(float(number))
 
-        if "carrying out attack" in line:
-            one_attacker_defense_every_ten["attack_rounds"].append(int(round)-99)
 
-# rounds = len(all["_without_attack"]["train_accuracy"])
-#
-# print(rounds)
+# results = pne_shot_cifar
+blood_cell_oneShot_decay = {"attack_rounds":[2],"train_loss_after": [0.02220470830798149, 0.00963919423520565, 0.011261353269219398, 0.010522926226258278, 0.008540460839867592, 0.008282573893666267, 0.01405562274158001, 0.00925908237695694, 0.00687430752441287, 0.006813913583755493, 0.005722425878047943, 0.005368785001337528], "train_loss_before": [], "test_loss_before": [], "test_loss_after": [], "test_accuracy_after": [89.81394804586941, 91.29417271238006, 94.62906622981512, 95.03276386613621, 95.20828457758016, 95.42476012169436, 95.02691317575474, 94.5471565644746, 94.63491692019659, 95.734846711912, 96.29651298853264, 96.91668616896794], "test_accuracy_before": [], "train_accuracy_after": [81.87504348580788, 90.95816495694764, 89.72834975294677, 90.9918333803149, 91.94918878773376, 92.62837115514932, 90.19309340932078, 92.14824365157565, 94.05124705828878, 94.13586195966823, 94.43626368946862, 94.88603578938408], "train_accuracy_before": [], "backdoor_test_loss_after": [], "backdoor_test_loss_before": [], "backdoor_test_accuracy_before": [], "backdoor_test_accuracy_after": [10.227006786800843, 99.5319447694828, 94.1142054762462, 74.04048677743974, 57.26070676339808, 46.31406505967704, 35.349871284811606, 24.865434121226304, 21.969342382401123, 19.558857945237538, 17.47016147905453, 18.587643341914347], "remove": [], "unsure": [], "correct": [], "incorrect": [], "avg": [], "conv_avg": []}
+# results =blood_cell_oneShot_decay
 
-results=one_attacker_defense_every_ten
+
+blood_cell_one_attacker_every_other_round_after_conv = {"attack_rounds":[2,4,6,8,10,12,14,16],"train_loss_after": [0.02105289325118065, 0.010290583595633507, 0.010186538100242615, 0.009801648557186127, 0.009539001621305943, 0.00854569859802723, 0.012820154428482056, 0.008442001417279243, 0.007773947436362505, 0.007977605797350407, 0.007570584304630756, 0.006292234640568495, 0.01069022249430418, 0.007264476735144854, 0.006656434386968613], "train_loss_before": [], "test_loss_before": [], "test_loss_after": [], "test_accuracy_after": [89.69108354785865, 91.77978001404166, 94.49450035104142, 93.57009127076995, 95.57687807161246, 95.97472501755207, 96.25555815586239, 96.42522817692488, 96.82892581324596, 96.84062719400889, 97.16241516498947, 97.10390826117482, 97.58951556283641, 97.49005382635151, 97.71823075122865], "test_accuracy_before": [], "train_accuracy_after": [83.04361312593734, 90.79365814709993, 90.47819439743505, 91.37867889477674, 91.60492382504235, 92.40043609372913, 90.366922602094, 93.25974988242807, 92.84393944342787, 93.56959303265181, 93.10150508469751, 94.70064173685708, 90.80855211245967, 93.8996414985988, 93.98986952062424], "train_accuracy_before": [], "backdoor_test_loss_after": [], "backdoor_test_loss_before": [], "backdoor_test_accuracy_before": [], "backdoor_test_accuracy_after": [9.173882518137141, 99.34472267727593, 93.42967470161479, 99.5143926983384, 96.5890475076059, 99.66065995787503, 98.41446290662299, 99.15164989468758, 95.82260706763398, 99.83618066931898, 99.09899368125438, 99.80692721741165, 99.22185817926515, 99.77182307512287, 99.58460098291599], "remove": [], "unsure": [], "correct": [], "incorrect": [], "avg": [], "conv_avg": []}
+blood_cell_one_attacker_every_other_round_after_conv["test_accuracy_after"].append(blood_cell_one_attacker_every_other_round_after_conv["test_accuracy_after"][-2])
+blood_cell_one_attacker_every_other_round_after_conv["backdoor_test_accuracy_after"].append(blood_cell_one_attacker_every_other_round_after_conv["backdoor_test_accuracy_after"][-2])
+
+
+
+
+# broken_scott_CIFAR_attack_and_defence_every_round_beginning = {"attack_rounds":[],"train_loss_after": [], "train_loss_before": [], "test_loss_before": [], "test_loss_after": [], "test_accuracy_after": [31.61, 32.31, 33.89, 32.9, 36.08, 29.96, 32.62, 31.82, 34.46, 28.82, 29.96, 33.03, 29.49, 32.86, 35.26, 30.65, 33.05, 31.72, 32.49, 32.43, 28.68, 31.33, 31.51, 32.21, 34.11, 31.55, 35.02, 33.18, 33.98, 31.88, 31.74, 31.98, 30.51, 35.11, 33.55, 29.92, 32.22, 37.34, 33.31, 31.46, 30.65, 34.01, 33.58, 29.74, 33.79, 32.21, 32.14, 32.26, 32.32], "test_accuracy_before": [], "train_accuracy_after": [], "train_accuracy_before": [], "backdoor_test_loss_after": [], "backdoor_test_loss_before": [], "backdoor_test_accuracy_before": [], "backdoor_test_accuracy_after": [10.74, 1.35, 4.66, 7.27, 11.58, 15.36, 17.78, 25.73, 22.16, 25.18, 27.62, 30.16, 27.27, 34.79, 42.26, 26.66, 41.03, 40.8, 43.92, 38.97, 45.26, 61.13, 62.1, 64.28, 71.71, 62.72, 75.36, 73.61, 70.9, 62.71, 73.47, 72.05, 63.28, 74.28, 73.35, 67.79, 72.86, 75.51, 67.63, 72.02, 75.28, 76.12, 72.48, 75.75, 81.84, 77.99, 77.36, 77.31, 77.38], "remove": [], "unsure": [], "correct": [], "incorrect": [], "avg": [], "conv_avg": []}
+# broken_scott_CIFAR_attack_and_defence_every_round_beginning["attack_rounds"] = list(range(1,10))
+# results = broken_scott_CIFAR_attack_and_defence_every_round_beginning
+
+CIFAR_after_convergence_attack_every_other_no_defense ={"attack_rounds":[2,4,6,8,10,12,14,16],"train_loss_after": [], "train_loss_before": [], "test_loss_before": [], "test_loss_after": [], "test_accuracy_after": [83.0, 78.92, 79.94, 79.86, 80.75, 80.6, 81.16, 81.64, 82.09, 80.74, 81.46, 81.51, 82.08, 81.83, 82.51, 81.73], "test_accuracy_before": [], "train_accuracy_after": [], "train_accuracy_before": [], "backdoor_test_loss_after": [], "backdoor_test_loss_before": [], "backdoor_test_accuracy_before": [], "backdoor_test_accuracy_after": [8.08, 97.73, 95.71, 98.82, 97.93, 98.54, 97.36, 98.11, 97.01, 99.34, 98.46, 98.86, 97.85, 97.18, 95.67, 98.36], "remove": [], "unsure": [], "correct": [], "incorrect": [], "avg": [], "conv_avg": []}
+results = CIFAR_after_convergence_attack_every_other_no_defense
 all = {"_with_attack": results}
 
-plt.rcParams.update({'font.size': 12})
-ax = plt.subplot()
-all["_with_attack"]["test_accuracy_before"].pop(0)
-all["_with_attack"]["backdoor_test_accuracy_before"].pop(0)
-rounds = len(all["_with_attack"]["test_accuracy_before"])
+CIFAR_after_convergence_attack_every_other_no_defense ={"attack_rounds":[2,4,6,8,10,12,14],"train_loss_after": [], "train_loss_before": [], "test_loss_before": [], "test_loss_after": [], "test_accuracy_after": [83.0, 78.92, 79.94, 79.86, 80.75, 80.6, 81.16, 81.64, 82.09, 80.74, 81.46, 81.51, 82.08, 81.83, 82.51, 81.73], "test_accuracy_before": [], "train_accuracy_after": [], "train_accuracy_before": [], "backdoor_test_loss_after": [], "backdoor_test_loss_before": [], "backdoor_test_accuracy_before": [], "backdoor_test_accuracy_after": [8.08, 97.73, 95.71, 98.82, 97.93, 98.54, 97.36, 98.11, 97.01, 99.34, 98.46, 98.86, 97.85, 97.18, 95.67, 98.36], "remove": [], "unsure": [], "correct": [], "incorrect": [], "avg": [], "conv_avg": []}
+# results = CIFAR_after_convergence_attack_every_other_no_defense
 
-print(rounds)
+results = one_attacker_every_other_round_defense_after_conv
+
+all = base_acc_cifar_and_every_ten
+#
+# all = {"_with_attack": base_acc_cifar_and_every_ten}
+
+rounds = len(all["_with_attack"]["test_accuracy"])
+
+print("CIFAR:",rounds)
 
 x_axis = np.arange(1, rounds + 1)
 i = 0
 colours = {"test accuracy without attack": "b",
-           "test accuracy before": "g",
-           "backdoor accuracy before": "r",
-           "test accuracy after": "yellowgreen",
-           "backdoor accuracy after": "hotpink",
+           "test accuracy": "g",
+           "backdoor accuracy": "r",
+           "test accuracy after": "g", #"yellowgreen",
+           "backdoor accuracy after": "r", #"hotpink",
            "train accuracy": "purple"}
 
+colours = {"test accuracy without attack": "b",
+           "test accuracy": "g",
+           "backdoor accuracy": "r",
+           "test accuracy": "g", #"yellowgreen",
+           "backdoor accuracy": "r", #"hotpink",
+           "train accuracy": "blue"}
 
-for att in results["attack_rounds"][:-1]:
-    plt.axvline(x=int(att), color='orange', linestyle="dashed")
 
-plt.axvline(x=int(results["attack_rounds"][-1]), color='orange', linestyle="dashed", label="Attack occurred")
+
+#
+
+plt.rcParams.update({'font.size': 13})
+
+
+fig, (ax1,ax2) = plt.subplots(1,2,sharey=False)
+
+# fig, (ax1,ax2) = plt.subplots(1,2,sharey=False)
+
+# Hide grid lines
+plt.grid(False)
+# fig, ax1 = plt.subplots(1,1,sharey=True)
+
+
+# for att in results["attack_rounds"][:-1]:
+#     ax1.axvline(x=int(att), color='orange', linestyle="dashed")
+#
+# ax1.axvline(x=int(results["attack_rounds"][-1]), color='orange', linestyle="dashed", label="Attack occurred")
 
 # plt.axvline(x=int(results["removed_round"][0]), color='purple', linestyle="dashed", label="All attackers were removed.")
 
@@ -447,52 +545,130 @@ plt.axvline(x=int(results["attack_rounds"][-1]), color='orange', linestyle="dash
 for result in all.keys():
     for metric in all[result].keys():
         values = all[result][metric]
-        if len(values) > 0 and "accuracy" in metric and "train" not in metric:
+        if len(values) > 0 and "accuracy" in metric and "backdoor" not in metric and "without" in result:
             label = metric + result
+            print(label)
             if "backdoor" in metric:
-                label = "backdoor accuracy before"
+                label = "backdoor accuracy"# before"
                 if "after" in metric:
-                    label = "backdoor accuracy after"
+                    label = "backdoor accuracy"# after"
+
+            elif "train" in metric:
+                label = "train accuracy"
 
             elif "without" in result:
                 label= "test accuracy"
 
-            # elif "train" in metric:
-            #     label = "train accuracy"
+
             else:
-                label = "test accuracy before"
+                label = "test accuracy"# before"
                 if "after" in metric:
-                    label = "test accuracy after"
+                    label = "test accuracy"# after"
             y_axis = np.array(values)
-            ax.plot(x_axis, y_axis, colours[label], label=label.capitalize(), linestyle="",marker="o")
+            ax1.plot(x_axis, y_axis, colours[label], label=label.capitalize()) #, linestyle="",marker="o")
 
             i += 1
 
-    ax.set(xlabel='Number of communication rounds after convergence', ylabel='Accuracy (%)', )
+    ax1.set(xlabel='Communication rounds', ylabel='Accuracy (%)', )
     # ax.set(xlabel='Number of Rounds after convergence', ylabel='Accuracy (%)')
-ax.grid()
-ax.set_yticks([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
+ax1.grid()
+ax1.set_yticks([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
 # ax.set_xticks([0,10,20,30,40,50,60,70,80,90,100, 110])
 
-box = ax.get_position()
-ax.set_position([box.x0, box.y0 + box.height * 0.1,
-                 box.width, box.height * 0.9])
+# box = ax1.get_position()
+# ax1.set_position([box.x0, box.y0 + box.height * 0.1,
+#                  box.width, box.height * 0.9])
+
+# Put a legend below current axis
+# ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
+#           fancybox=True, shadow=True, ncol=5)
+
+ax1.grid(False)
+# ax1.set_xticks(ticks = [1]+ list(range(10,rounds+1,10)), labels= [-1] + list(range(10, rounds-1,10)))
+# ax1.set_xticks(ticks = list(range(0,rounds+1,10)), labels= list(range(0, rounds-1,10)))
+
+# ax1.set_box_aspect(aspect=1)
+
+##################################
+results = base_acc_blood_cell
+
+all = {"_with_attack": results}
+rounds = len(all["_with_attack"]["test_accuracy"])
+
+
+x_axis = np.arange(1, rounds + 1)
+i = 0
+print("BLOOD",rounds)
+
+# ax = plt.subplot(1,2,2)
+
+
+# ax1.set_box_aspect(aspect=1)
+# for att in results["attack_rounds"][:-1]:
+#     ax2.axvline(x=int(att), color='orange', linestyle="dashed")
+#
+# ax2.axvline(x=int(results["attack_rounds"][-1]), color='orange', linestyle="dashed", label="Attack occurred")
+# ax2.axvline(x=int(results["attack_rounds"][-1]), color='orange', linestyle="dashed", label="Attack occurred")
+
+# plt.axvline(x=int(results["removed_round"][0]), color='purple', linestyle="dashed", label="All attackers were removed.")
+
+
+for result in all.keys():
+    for metric in all[result].keys():
+        values = all[result][metric]
+        if len(values) > 0 and "accuracy" in metric and "backdoor" not in metric:
+            label = metric + result
+            if "backdoor" in metric:
+                label = "backdoor accuracy"# before"
+                if "after" in metric:
+                    label = "backdoor accuracy"# after"
+
+            elif "without" in result:
+                label= "test accuracy"
+
+            elif "train" in metric:
+                label = "train accuracy"
+            else:
+                label = "test accuracy"# before"
+                if "after" in metric:
+                    label = "test accuracy"# after"
+            y_axis = np.array(values)
+            ax2.plot(x_axis, y_axis, colours[label], label=label.capitalize()) #, linestyle="",marker="o")
+
+            i += 1
+
+    ax2.set(xlabel='Communication rounds')#, ylabel='Accuracy (%)', )
+    # ax.set(xlabel='Number of Rounds after convergence', ylabel='Accuracy (%)')
+ax2.grid()
+ax2.set_yticks([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
+# ax.set_xticks([0,10,20,30,40,50,60,70,80,90,100, 110])
+
+# box = ax2.get_position()
+# ax2.set_position([box.x0, box.y0 + box.height * 0.1,
+#                  box.width, box.height * 0.9])
 
 # Put a legend below current axis
 # ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
 #           fancybox=True, shadow=True, ncol=5)
 
 
-ax.set_xticks(list(range(1,rounds,10)) + [40])
+ax2.set_xticks(ticks = list(range(0,rounds+2, 50)), labels= list(range(0, rounds+2,50)))
+# ax2.set_xticks(ticks = [1,2]+ list(range(5,rounds+1,5)), labels= [-1,0] + list(range(5, rounds-1,5)))
+
+
+
+#########
 # print(results)
 plt.legend(bbox_to_anchor=(1.04, 0), loc="lower left", borderaxespad=0)
 plt.subplots_adjust(right=0.7)
 # ax.legend(loc='lower right')
 # ax.legend(bbox_to_anchor=(1, 0.7))
 # ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.1),shadow=True, ncol=5)
+# ax1.set_title("Few-shot attack on the CIFAR10 data set.", size =14)
+#
+# ax2.set_title("Few-shot attack on the blood cell data set.", size =14)
 
-plt.title("Backdoor and main task accuracy before and after applying defence.")
-
-matplotlib.rcParams.update({'font.size': 22})
+# matplotlib.rcParams.update({'font.size': 16})
+plt.grid(False)
 
 plt.show()

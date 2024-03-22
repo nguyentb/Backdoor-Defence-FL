@@ -1,7 +1,7 @@
 import torch
 import yaml
 import numpy as np
-from preprocess_dataset import train_dataset, test_dataset, train_labels
+from preprocess_dataset import train_dataset, test_dataset, train_labels, labels
 import warnings
 from server import server_train
 from defense import testing
@@ -9,8 +9,11 @@ from client import to_device, resnet_18, device, classes
 
 warnings.filterwarnings("ignore")
 
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('TkAgg')
 
-def federated_learning(attack=False, preload=False):
+def federated_learning(attack=False, preload=False, number_of_attackers=1 , iteration=1):
     cifar_cnn = resnet_18()
     global_net = to_device(cifar_cnn, device)
     if preload:
@@ -19,7 +22,7 @@ def federated_learning(attack=False, preload=False):
         # print("BEFORE", t_accuracy)
         print("BEFORE:  93.38")
 
-    server_train(attack, global_net, config, client_idcs)
+    server_train(attack, global_net, config, client_idcs, number_of_attackers, iteration)
 
 
 def split_non_iid(alpha):
@@ -65,4 +68,27 @@ if __name__ == '__main__':
     test_idcs = np.random.permutation(len(test_dataset))
     client_idcs = split_non_iid(config["dirichlet_alpha"])
 
-    federated_learning(bool(config["carry_attack"]), bool(config["preload_model"]))
+    mapp = np.array(labels)
+
+    plt.figure(figsize=(10, 5))
+    plt.rcParams.update({'font.size': 13})
+
+    ax = plt.subplot()
+    cm = plt.cm.viridis(np.linspace(0, 1, 5))
+    ax.set_prop_cycle('color', list(cm))
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.hist([train_labels[idc] for idc in client_idcs], stacked=True,
+            bins=np.arange(min(train_labels) - 0.5, max(train_labels) + 1.5, 1),
+            label=["Client {}".format(i) for i in range(5)])
+    plt.xticks(np.arange(8), mapp)
+
+    ax.set(ylabel='Number of samples')
+    plt.legend(reverse=True)
+    plt.show()
+    
+    # for number_of_attackers in range(1,11):
+    #     for iteration in range(1,11):
+    # federated_learning(bool(config["carry_attack"]), bool(config["preload_model"]), 1, 1)

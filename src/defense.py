@@ -11,7 +11,7 @@ import random
 import numpy as np
 from torchvision.models import resnet18
 from torchvision.transforms import transforms
-import hypergrad as hg
+import src.hypergrad as hg
 from numpy.linalg import norm
 
 
@@ -161,7 +161,7 @@ def calc_dist(new_model, old_model):
         print(distance.item())
         print(output[0][0].item())
         print(hamming[0][0].item())
-
+        return euclidean
 
 # def flatten_comprehension(matrix):
 #     return [item for row in matrix for item in row]
@@ -174,11 +174,11 @@ def flatten_comprehension(xs):
             yield x
 
 
-def calculate_difference(model, old_model, test_set, results):
+def calculate_difference(model, old_model, dataset, results):
     # print("CALCULATING DIFFERENCES ")
 
     avg = calc_diff(copy.deepcopy(model), copy.deepcopy(old_model))
-    calc_dist(copy.deepcopy(model), copy.deepcopy(old_model))
+    euclidean = calc_dist(copy.deepcopy(model), copy.deepcopy(old_model))
 
     prev_model = copy.deepcopy(model)
 
@@ -242,14 +242,25 @@ def calculate_difference(model, old_model, test_set, results):
 
     model = copy.deepcopy(prev_model)
 
-    if conv_avg < -0.0065 or (conv_avg / avg) > 15 or (conv_avg / avg) < -4:
-        print("MODEL WAS POISONED")
-        return 1
+    if dataset == "blood cell":
+        if euclidean > 1.82:
+            print("MODEL WAS POISONED")
+            return 1
 
-    if conv_avg > -0.005 and avg < 0:
-        print("I KNOW IT IS CLEAN")
-        print("Going back to previous model")
-        return 0
+        if euclidean < 1.8 :
+            print("I KNOW IT IS CLEAN")
+            print("Going back to previous model")
+            return 0
+
+    else:
+        if conv_avg < -0.0065 or (conv_avg / avg) > 15 or (conv_avg / avg) < -4:
+            print("MODEL WAS POISONED")
+            return 1
+
+        if conv_avg > -0.005 and avg < 0:
+            print("I KNOW IT IS CLEAN")
+            print("Going back to previous model")
+            return 0
 
     return 2
 
@@ -268,8 +279,8 @@ def get_eval_data(test_set_o):
     IMAGE_SIZE = 32
 
     torch.manual_seed(43)
-    val_size = math.floor(len(test_set_o) * 0.2)
-    unl_size = math.floor(len(test_set_o) * 0.8)
+    val_size = math.floor(len(test_set_o) * 0.1)
+    unl_size = math.floor(len(test_set_o) * 0.4)
     trash = len(test_set_o) - val_size - unl_size
     unl_set, test_set, _ = random_split(test_set_o, [unl_size, val_size, trash])
 
@@ -287,7 +298,7 @@ def resnet_18():
 
 
 def apply_defense(rounds, model, imgs_tes, images_list, labels_list, unlloader, test_set,
-                  args, init, device, results):
+                  args, init, device, results, dataset):
     old_model = copy.deepcopy(model)
     print("apply defense")
     test_accuracy("BEFORE", copy.deepcopy(model), test_set)
@@ -343,16 +354,9 @@ def apply_defense(rounds, model, imgs_tes, images_list, labels_list, unlloader, 
         pert = batch_pert * min(1, 10 / torch.norm(batch_pert))
         # pert = batch_pert
         # unlearn step
-        # avgs = []
         for batchnum in range(len(images_list)):
             outer_opt.zero_grad()
             hg.fixed_point(pert, list(model.parameters()), 5, inner_opt, loss_outer)
-
-            # hgrads = [v.tolist() for v in grads]
-
-            # hgrads = list(flatten_comprehension(hgrads))
-
-            # avgs.append(sum(hgrads) / len(hgrads))
 
             outer_opt.step()
 
@@ -360,8 +364,8 @@ def apply_defense(rounds, model, imgs_tes, images_list, labels_list, unlloader, 
         test_accuracy("AFTER", copy.deepcopy(model), test_set)
 
         if not repeated:
-            poisoned = calculate_difference(model, old_model, test_set, results)
-            if poisoned == 1:
+            poisoned = calculate_difference(model, old_model, dataset, results)
+            if poisoned == 1 and dataset != "blood cell":
                 print("repeating cleaning")
                 repeated = True
                 _round = _round - 1
@@ -392,5 +396,5 @@ def clean_model(model, device, test_set, dataset, results=None, init=False):
 
     return apply_defense(rounds=1, model=model, imgs_tes=imgs_tes, images_list=images_list,
                          labels_list=labels_list, unlloader=unlloader,
-                         test_set=test_set, args=args, init=init, device=device, results=results)
+                         test_set=test_set, args=args, init=init, device=device, results=results, dataset=dataset)
 

@@ -1,29 +1,32 @@
 # Federated Learning
-#preload_model: False
+#preload_model: True
 #load_results: False
 #preload_model_name: no_attack_new
-#start_round: 1
-#log_file: testTrainAutoChangingCode
-#carry_attack: False
+#start_round: 100
+#log_file: effectOfAttacker
+#carry_attack: True
 #carry_defence: False
 
-preload_model: False
+preload_model: True
 load_results: False
 preload_model_name: no_attack_new
-start_round: 1
-log_file: testTrainAutoChangingCode
-carry_attack: False
-carry_defence: False
+start_round: 99
+log_file: defence_with
+  
+  
+  _ratio_sibu
+carry_attack: True
+carry_defence: True
 
 dataset: blood cell
 
 
 total_clients: 70
-client_num_proportion: 0.2
-rounds: 200
+client_num_proportion: 0.1
+rounds: 100
 dirichlet_alpha: 0.9
 
-lr_decrease_epochs: [100, 100, 160, 200]
+lr_decrease_epochs: [60, 99, 160, 200]
 #lr_decrease_epochs: [0, 0, 10, 50]
 
 # Server
@@ -36,17 +39,9 @@ benign_epochs: 2
 momentum: 0.9
 
 optimizer: SGD
-#optimizer: Adam
-#log_file: new_Adam_start
-#log_file: new_SGD_start_2
-#log_file: SGD_09momentum
-#log_file: SGD_09momentum_01
-#log_file: Adam_last_layer
-#log_file: testGoodTrain
-
 
 # Malicious client
 poisoning_label: 2
-attacker_epochs: 15
+# 20 for CIFAR10
 poisoning_num: 1
-poisoning_epoch: 101
+poisoning_epoch: 100
