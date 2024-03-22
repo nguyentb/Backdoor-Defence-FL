@@ -1,43 +1,38 @@
-# Readme
+# University of Glasgow - Federated Learning - Marina san José Peña
 
-[//]: # (Put a brief description of your code here. This should at least describe the file structure.)
+This project explores federated learning, a machine learning technique that enables training models on distributed devices without sharing raw data.
 
+## Requirements
+Python3.7
 
-## Build instructions
+## Installation
+### Create a virtual environment:
 
-[//]: # (**You must** include the instructions necessary to build and deploy this project successfully. If appropriate,
- also include instructions to run automated tests. )
-
-
-
-### Requirements
-[//]: # (List the all of the pre-requisites software required to set up your project &#40;e.g. compilers, packages, libraries, OS, hardware&#41;)
+console
+python -m venv venv
 
 
-* Python 3.7 ?
-* Packages: listed in `requirements.txt` 
-* Tested on Windows 10 and Linux Ubuntu ?
-* Blood Cell dataset: can be downloaded from ...
+OR
 
-[//]: # (or another example:)
+console
+python3 -m venv venv
 
-[//]: # (* Requires Raspberry Pi 3 )
-[//]: # (* a Linux host machine with the `arm-none-eabi` toolchain &#40;at least version `x.xx`&#41; installed)
-[//]: # (* a working LuaJIT installation > 2.1.0)
 
-### Build steps
+### Activate the virtual environment:
+console
+source venv/bin/activate
 
-List the steps required to build software. 
 
-Hopefully something simple like `pip install -e .` or `make` or `cd build; cmake ..`. In
-some cases you may have much more involved setup required.
+### Install requirements
+console
+pip install -r requirements.txt
 
-### Test steps
 
-List steps needed to show your software works. This might be running a test suite, or just starting the program; but something that could be used to verify your code is working correctly.
+## Running the federated learning
 
-Examples:
+console
+python ./src/main.py
 
-* Run automated tests by running `pytest`
-* Start the software by running `bin/editor.exe` and opening the file `examples/example_01.bin`
 
+## End regards
+If you have any questions feel free to reach put to myself via github.
