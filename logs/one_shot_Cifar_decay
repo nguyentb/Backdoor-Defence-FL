@@ -1,0 +1,2024 @@
+Files already downloaded and verified
+Files already downloaded and verified
+Start Round 99 ...
+Total size:  4545
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0022, device='cuda:0')
+
+BACKDOOR: 8.2
+MAIN ACCURACY: 83.05
+
+Start Round 100 ...
+carrying out attack
+Attacker scaling by 100
+malicious client dataset size:  442
+Total size:  5955
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0030, device='cuda:0')
+
+BACKDOOR: 98.6
+MAIN ACCURACY: 79.16
+
+Start Round 101 ...
+Total size:  5117
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0038, device='cuda:0')
+
+BACKDOOR: 97.32
+MAIN ACCURACY: 80.28
+
+Start Round 102 ...
+Total size:  5626
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0034, device='cuda:0')
+
+BACKDOOR: 95.36
+MAIN ACCURACY: 81.01
+
+Start Round 103 ...
+Total size:  5459
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0031, device='cuda:0')
+
+BACKDOOR: 93.3
+MAIN ACCURACY: 81.46
+
+Start Round 104 ...
+Total size:  5035
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0028, device='cuda:0')
+
+BACKDOOR: 90.21
+MAIN ACCURACY: 81.63
+
+Start Round 105 ...
+Total size:  5037
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0019, device='cuda:0')
+
+BACKDOOR: 87.51
+MAIN ACCURACY: 81.9
+
+Start Round 106 ...
+Total size:  5590
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0023, device='cuda:0')
+
+BACKDOOR: 84.67
+MAIN ACCURACY: 82.08
+
+Start Round 107 ...
+Total size:  4895
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0018, device='cuda:0')
+
+BACKDOOR: 82.3
+MAIN ACCURACY: 82.24
+
+Start Round 108 ...
+Total size:  5016
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0023, device='cuda:0')
+
+BACKDOOR: 79.79
+MAIN ACCURACY: 82.39
+
+Start Round 109 ...
+Total size:  5626
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0019, device='cuda:0')
+
+BACKDOOR: 77.63
+MAIN ACCURACY: 82.59
+
+Start Round 110 ...
+Total size:  5292
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0013, device='cuda:0')
+
+BACKDOOR: 74.7
+MAIN ACCURACY: 82.6
+
+Start Round 111 ...
+Total size:  4635
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0015, device='cuda:0')
+
+BACKDOOR: 73.35
+MAIN ACCURACY: 82.62
+
+Start Round 112 ...
+Total size:  4755
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0016, device='cuda:0')
+
+BACKDOOR: 72.11
+MAIN ACCURACY: 82.55
+
+Start Round 113 ...
+Total size:  4383
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0016, device='cuda:0')
+
+BACKDOOR: 70.94
+MAIN ACCURACY: 82.58
+
+Start Round 114 ...
+Total size:  4326
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0013, device='cuda:0')
+
+BACKDOOR: 69.31
+MAIN ACCURACY: 82.61
+
+Start Round 115 ...
+Total size:  5984
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0013, device='cuda:0')
+
+BACKDOOR: 67.75
+MAIN ACCURACY: 82.76
+
+Start Round 116 ...
+Total size:  5516
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0010, device='cuda:0')
+
+BACKDOOR: 66.89
+MAIN ACCURACY: 82.84
+
+Start Round 117 ...
+Total size:  4934
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0055, device='cuda:0')
+
+BACKDOOR: 64.94
+MAIN ACCURACY: 82.76
+
+Start Round 118 ...
+Total size:  5446
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0013, device='cuda:0')
+
+BACKDOOR: 63.28
+MAIN ACCURACY: 82.85
+
+Start Round 119 ...
+Total size:  4632
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0010, device='cuda:0')
+
+BACKDOOR: 62.54
+MAIN ACCURACY: 82.87
+
+Start Round 120 ...
+Total size:  5097
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0010, device='cuda:0')
+
+BACKDOOR: 62.05
+MAIN ACCURACY: 82.96
+
+Start Round 121 ...
+Total size:  4408
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0011, device='cuda:0')
+
+BACKDOOR: 61.38
+MAIN ACCURACY: 83.01
+
+Start Round 122 ...
+Total size:  5588
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0013, device='cuda:0')
+
+BACKDOOR: 60.78
+MAIN ACCURACY: 83.09
+
+Start Round 123 ...
+Total size:  5301
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0010, device='cuda:0')
+
+BACKDOOR: 59.97
+MAIN ACCURACY: 83.14
+
+Start Round 124 ...
+Total size:  5031
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0010, device='cuda:0')
+
+BACKDOOR: 59.39
+MAIN ACCURACY: 83.19
+
+Start Round 125 ...
+Total size:  3799
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0018, device='cuda:0')
+
+BACKDOOR: 58.06
+MAIN ACCURACY: 83.23
+
+Start Round 126 ...
+Total size:  5592
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0019, device='cuda:0')
+
+BACKDOOR: 57.53
+MAIN ACCURACY: 83.2
+
+Start Round 127 ...
+Total size:  6196
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0011, device='cuda:0')
+
+BACKDOOR: 56.87
+MAIN ACCURACY: 83.25
+
+Start Round 128 ...
+Total size:  5954
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0014, device='cuda:0')
+
+BACKDOOR: 55.49
+MAIN ACCURACY: 83.21
+
+Start Round 129 ...
+Total size:  4728
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0010, device='cuda:0')
+
+BACKDOOR: 54.69
+MAIN ACCURACY: 83.25
+
+Start Round 130 ...
+Total size:  4708
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 54.25
+MAIN ACCURACY: 83.3
+
+Start Round 131 ...
+Total size:  3908
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0011, device='cuda:0')
+
+BACKDOOR: 53.98
+MAIN ACCURACY: 83.28
+
+Start Round 132 ...
+Total size:  4982
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0010, device='cuda:0')
+
+BACKDOOR: 52.94
+MAIN ACCURACY: 83.31
+
+Start Round 133 ...
+Total size:  5454
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0009, device='cuda:0')
+
+BACKDOOR: 52.58
+MAIN ACCURACY: 83.34
+
+Start Round 134 ...
+Total size:  5328
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 51.91
+MAIN ACCURACY: 83.38
+
+Start Round 135 ...
+Total size:  6319
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0009, device='cuda:0')
+
+BACKDOOR: 51.09
+MAIN ACCURACY: 83.35
+
+Start Round 136 ...
+Total size:  5108
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0011, device='cuda:0')
+
+BACKDOOR: 50.71
+MAIN ACCURACY: 83.37
+
+Start Round 137 ...
+Total size:  4927
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0013, device='cuda:0')
+
+BACKDOOR: 50.24
+MAIN ACCURACY: 83.35
+
+Start Round 138 ...
+Total size:  4682
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0012, device='cuda:0')
+
+BACKDOOR: 50.02
+MAIN ACCURACY: 83.37
+
+Start Round 139 ...
+Total size:  4650
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0012, device='cuda:0')
+
+BACKDOOR: 49.08
+MAIN ACCURACY: 83.34
+
+Start Round 140 ...
+Total size:  5514
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0016, device='cuda:0')
+
+BACKDOOR: 48.39
+MAIN ACCURACY: 83.48
+
+Start Round 141 ...
+Total size:  4579
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0010, device='cuda:0')
+
+BACKDOOR: 48.09
+MAIN ACCURACY: 83.46
+
+Start Round 142 ...
+Total size:  4941
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0010, device='cuda:0')
+
+BACKDOOR: 47.62
+MAIN ACCURACY: 83.54
+
+Start Round 143 ...
+Total size:  5238
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 47.09
+MAIN ACCURACY: 83.51
+
+Start Round 144 ...
+Total size:  5167
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0012, device='cuda:0')
+
+BACKDOOR: 46.3
+MAIN ACCURACY: 83.55
+
+Start Round 145 ...
+Total size:  5288
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0013, device='cuda:0')
+
+BACKDOOR: 45.91
+MAIN ACCURACY: 83.55
+
+Start Round 146 ...
+Total size:  5280
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0010, device='cuda:0')
+
+BACKDOOR: 45.51
+MAIN ACCURACY: 83.55
+
+Start Round 147 ...
+Total size:  5770
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0011, device='cuda:0')
+
+BACKDOOR: 45.22
+MAIN ACCURACY: 83.6
+
+Start Round 148 ...
+Total size:  4901
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0010, device='cuda:0')
+
+BACKDOOR: 44.78
+MAIN ACCURACY: 83.6
+
+Start Round 149 ...
+Total size:  4616
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0010, device='cuda:0')
+
+BACKDOOR: 44.25
+MAIN ACCURACY: 83.59
+
+Start Round 150 ...
+Total size:  5174
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0010, device='cuda:0')
+
+BACKDOOR: 44.2
+MAIN ACCURACY: 83.67
+
+Start Round 151 ...
+Total size:  5735
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0011, device='cuda:0')
+
+BACKDOOR: 43.37
+MAIN ACCURACY: 83.6
+
+Start Round 152 ...
+Total size:  5034
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0011, device='cuda:0')
+
+BACKDOOR: 43.49
+MAIN ACCURACY: 83.68
+
+Start Round 153 ...
+Total size:  4757
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0011, device='cuda:0')
+
+BACKDOOR: 43.57
+MAIN ACCURACY: 83.75
+
+Start Round 154 ...
+Total size:  5316
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 43.68
+MAIN ACCURACY: 83.76
+
+Start Round 155 ...
+Total size:  4915
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0011, device='cuda:0')
+
+BACKDOOR: 44.1
+MAIN ACCURACY: 83.67
+
+Start Round 156 ...
+Total size:  5082
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0009, device='cuda:0')
+
+BACKDOOR: 43.46
+MAIN ACCURACY: 83.6
+
+Start Round 157 ...
+Total size:  4356
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 43.35
+MAIN ACCURACY: 83.6
+
+Start Round 158 ...
+Total size:  5280
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0012, device='cuda:0')
+
+BACKDOOR: 43.29
+MAIN ACCURACY: 83.58
+
+Start Round 159 ...
+Total size:  5637
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0009, device='cuda:0')
+
+BACKDOOR: 42.87
+MAIN ACCURACY: 83.69
+
+Start Round 160 ...
+Total size:  4846
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0010, device='cuda:0')
+
+BACKDOOR: 42.28
+MAIN ACCURACY: 83.64
+
+Start Round 161 ...
+Total size:  5710
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 41.73
+MAIN ACCURACY: 83.74
+
+Start Round 162 ...
+Total size:  5206
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0010, device='cuda:0')
+
+BACKDOOR: 41.54
+MAIN ACCURACY: 83.75
+
+Start Round 163 ...
+Total size:  4660
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 41.32
+MAIN ACCURACY: 83.78
+
+Start Round 164 ...
+Total size:  4835
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0010, device='cuda:0')
+
+BACKDOOR: 40.44
+MAIN ACCURACY: 83.84
+
+Start Round 165 ...
+Total size:  4437
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 40.44
+MAIN ACCURACY: 83.83
+
+Start Round 166 ...
+Total size:  4969
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0009, device='cuda:0')
+
+BACKDOOR: 39.79
+MAIN ACCURACY: 83.91
+
+Start Round 167 ...
+Total size:  5607
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 39.84
+MAIN ACCURACY: 83.89
+
+Start Round 168 ...
+Total size:  4429
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0010, device='cuda:0')
+
+BACKDOOR: 39.41
+MAIN ACCURACY: 83.86
+
+Start Round 169 ...
+Total size:  4188
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0009, device='cuda:0')
+
+BACKDOOR: 38.79
+MAIN ACCURACY: 83.9
+
+Start Round 170 ...
+Total size:  5559
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 38.22
+MAIN ACCURACY: 83.99
+
+Start Round 171 ...
+Total size:  4363
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0010, device='cuda:0')
+
+BACKDOOR: 38.13
+MAIN ACCURACY: 83.96
+
+Start Round 172 ...
+Total size:  4295
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 38.23
+MAIN ACCURACY: 83.96
+
+Start Round 173 ...
+Total size:  5956
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 38.05
+MAIN ACCURACY: 84.02
+
+Start Round 174 ...
+Total size:  5196
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0011, device='cuda:0')
+
+BACKDOOR: 37.83
+MAIN ACCURACY: 83.91
+
+Start Round 175 ...
+Total size:  4280
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 37.56
+MAIN ACCURACY: 83.99
+
+Start Round 176 ...
+Total size:  5108
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0010, device='cuda:0')
+
+BACKDOOR: 37.13
+MAIN ACCURACY: 84.04
+
+Start Round 177 ...
+Total size:  5648
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 36.71
+MAIN ACCURACY: 84.05
+
+Start Round 178 ...
+Total size:  5173
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 37.01
+MAIN ACCURACY: 84.06
+
+Start Round 179 ...
+Total size:  4837
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0009, device='cuda:0')
+
+BACKDOOR: 36.73
+MAIN ACCURACY: 84.08
+
+Start Round 180 ...
+Total size:  5124
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 36.18
+MAIN ACCURACY: 84.01
+
+Start Round 181 ...
+Total size:  4714
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0015, device='cuda:0')
+
+BACKDOOR: 35.7
+MAIN ACCURACY: 83.92
+
+Start Round 182 ...
+Total size:  4578
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0010, device='cuda:0')
+
+BACKDOOR: 35.72
+MAIN ACCURACY: 83.98
+
+Start Round 183 ...
+Total size:  5167
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0030, device='cuda:0')
+
+BACKDOOR: 35.93
+MAIN ACCURACY: 83.96
+
+Start Round 184 ...
+Total size:  4576
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0013, device='cuda:0')
+
+BACKDOOR: 35.92
+MAIN ACCURACY: 84.03
+
+Start Round 185 ...
+Total size:  4987
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 35.81
+MAIN ACCURACY: 84.0
+
+Start Round 186 ...
+Total size:  5520
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 35.36
+MAIN ACCURACY: 83.97
+
+Start Round 187 ...
+Total size:  5131
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 35.57
+MAIN ACCURACY: 84.03
+
+Start Round 188 ...
+Total size:  3779
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0010, device='cuda:0')
+
+BACKDOOR: 35.79
+MAIN ACCURACY: 84.0
+
+Start Round 189 ...
+Total size:  5411
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0012, device='cuda:0')
+
+BACKDOOR: 35.73
+MAIN ACCURACY: 84.07
+
+Start Round 190 ...
+Total size:  4780
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0011, device='cuda:0')
+
+BACKDOOR: 35.19
+MAIN ACCURACY: 84.08
+
+Start Round 191 ...
+Total size:  4591
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0014, device='cuda:0')
+
+BACKDOOR: 34.86
+MAIN ACCURACY: 83.95
+
+Start Round 192 ...
+Total size:  5200
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 34.8
+MAIN ACCURACY: 84.01
+
+Start Round 193 ...
+Total size:  4705
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 34.67
+MAIN ACCURACY: 84.04
+
+Start Round 194 ...
+Total size:  5154
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0009, device='cuda:0')
+
+BACKDOOR: 34.28
+MAIN ACCURACY: 84.05
+
+Start Round 195 ...
+Total size:  6904
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 33.87
+MAIN ACCURACY: 84.12
+
+Start Round 196 ...
+Total size:  4891
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 33.66
+MAIN ACCURACY: 84.18
+
+Start Round 197 ...
+Total size:  4633
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 33.62
+MAIN ACCURACY: 84.21
+
+Start Round 198 ...
+Total size:  4861
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 33.5
+MAIN ACCURACY: 84.21
+
+Start Round 199 ...
+Total size:  4414
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 33.21
+MAIN ACCURACY: 84.22
+
+Start Round 200 ...
+Total size:  4986
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 33.08
+MAIN ACCURACY: 84.22
+
+Start Round 201 ...
+Total size:  4167
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0011, device='cuda:0')
+
+BACKDOOR: 33.12
+MAIN ACCURACY: 84.24
+
+Start Round 202 ...
+Total size:  4287
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 32.71
+MAIN ACCURACY: 84.28
+
+Start Round 203 ...
+Total size:  4987
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0009, device='cuda:0')
+
+BACKDOOR: 32.3
+MAIN ACCURACY: 84.28
+
+Start Round 204 ...
+Total size:  4841
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 32.22
+MAIN ACCURACY: 84.31
+
+Start Round 205 ...
+Total size:  4739
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 32.11
+MAIN ACCURACY: 84.26
+
+Start Round 206 ...
+Total size:  4779
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 32.25
+MAIN ACCURACY: 84.29
+
+Start Round 207 ...
+Total size:  5955
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 32.2
+MAIN ACCURACY: 84.3
+
+Start Round 208 ...
+Total size:  5645
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 32.15
+MAIN ACCURACY: 84.36
+
+Start Round 209 ...
+Total size:  5114
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0009, device='cuda:0')
+
+BACKDOOR: 32.29
+MAIN ACCURACY: 84.37
+
+Start Round 210 ...
+Total size:  4865
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 31.98
+MAIN ACCURACY: 84.3
+
+Start Round 211 ...
+Total size:  3628
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0010, device='cuda:0')
+
+BACKDOOR: 31.98
+MAIN ACCURACY: 84.27
+
+Start Round 212 ...
+Total size:  5364
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 31.58
+MAIN ACCURACY: 84.25
+
+Start Round 213 ...
+Total size:  4977
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 31.5
+MAIN ACCURACY: 84.32
+
+Start Round 214 ...
+Total size:  5276
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 31.54
+MAIN ACCURACY: 84.3
+
+Start Round 215 ...
+Total size:  4729
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 31.63
+MAIN ACCURACY: 84.27
+
+Start Round 216 ...
+Total size:  4896
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 31.35
+MAIN ACCURACY: 84.31
+
+Start Round 217 ...
+Total size:  4084
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0011, device='cuda:0')
+
+BACKDOOR: 31.41
+MAIN ACCURACY: 84.29
+
+Start Round 218 ...
+Total size:  4540
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 31.24
+MAIN ACCURACY: 84.28
+
+Start Round 219 ...
+Total size:  4512
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0009, device='cuda:0')
+
+BACKDOOR: 31.64
+MAIN ACCURACY: 84.3
+
+Start Round 220 ...
+Total size:  5322
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 31.74
+MAIN ACCURACY: 84.3
+
+Start Round 221 ...
+Total size:  5348
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 31.19
+MAIN ACCURACY: 84.31
+
+Start Round 222 ...
+Total size:  4136
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 31.13
+MAIN ACCURACY: 84.32
+
+Start Round 223 ...
+Total size:  5534
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 30.92
+MAIN ACCURACY: 84.38
+
+Start Round 224 ...
+Total size:  4848
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 31.07
+MAIN ACCURACY: 84.34
+
+Start Round 225 ...
+Total size:  4194
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 30.58
+MAIN ACCURACY: 84.38
+
+Start Round 226 ...
+Total size:  4422
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 30.44
+MAIN ACCURACY: 84.43
+
+Start Round 227 ...
+Total size:  5170
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 29.9
+MAIN ACCURACY: 84.35
+
+Start Round 228 ...
+Total size:  4234
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 30.08
+MAIN ACCURACY: 84.32
+
+Start Round 229 ...
+Total size:  3895
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0009, device='cuda:0')
+
+BACKDOOR: 29.96
+MAIN ACCURACY: 84.38
+
+Start Round 230 ...
+Total size:  5481
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 29.58
+MAIN ACCURACY: 84.29
+
+Start Round 231 ...
+Total size:  4304
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 29.85
+MAIN ACCURACY: 84.34
+
+Start Round 232 ...
+Total size:  5191
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 29.73
+MAIN ACCURACY: 84.33
+
+Start Round 233 ...
+Total size:  4989
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 29.45
+MAIN ACCURACY: 84.32
+
+Start Round 234 ...
+Total size:  5474
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 29.16
+MAIN ACCURACY: 84.3
+
+Start Round 235 ...
+Total size:  5563
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 29.02
+MAIN ACCURACY: 84.28
+
+Start Round 236 ...
+Total size:  5557
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0005, device='cuda:0')
+
+BACKDOOR: 28.78
+MAIN ACCURACY: 84.38
+
+Start Round 237 ...
+Total size:  4107
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 28.29
+MAIN ACCURACY: 84.39
+
+Start Round 238 ...
+Total size:  5067
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 28.26
+MAIN ACCURACY: 84.44
+
+Start Round 239 ...
+Total size:  4770
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 28.47
+MAIN ACCURACY: 84.36
+
+Start Round 240 ...
+Total size:  4290
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 28.49
+MAIN ACCURACY: 84.39
+
+Start Round 241 ...
+Total size:  5578
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 28.33
+MAIN ACCURACY: 84.39
+
+Start Round 242 ...
+Total size:  4614
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0009, device='cuda:0')
+
+BACKDOOR: 28.33
+MAIN ACCURACY: 84.42
+
+Start Round 243 ...
+Total size:  4366
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0005, device='cuda:0')
+
+BACKDOOR: 28.04
+MAIN ACCURACY: 84.42
+
+Start Round 244 ...
+Total size:  5523
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 27.72
+MAIN ACCURACY: 84.5
+
+Start Round 245 ...
+Total size:  6075
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 27.76
+MAIN ACCURACY: 84.41
+
+Start Round 246 ...
+Total size:  5222
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0009, device='cuda:0')
+
+BACKDOOR: 27.65
+MAIN ACCURACY: 84.5
+
+Start Round 247 ...
+Total size:  4832
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 27.84
+MAIN ACCURACY: 84.57
+
+Start Round 248 ...
+Total size:  4787
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0009, device='cuda:0')
+
+BACKDOOR: 27.69
+MAIN ACCURACY: 84.47
+
+Start Round 249 ...
+Total size:  4501
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 27.55
+MAIN ACCURACY: 84.47
+
+Start Round 250 ...
+Total size:  6206
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0005, device='cuda:0')
+
+BACKDOOR: 27.28
+MAIN ACCURACY: 84.52
+
+Start Round 251 ...
+Total size:  4657
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 27.45
+MAIN ACCURACY: 84.53
+
+Start Round 252 ...
+Total size:  4891
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0017, device='cuda:0')
+
+BACKDOOR: 27.43
+MAIN ACCURACY: 84.45
+
+Start Round 253 ...
+Total size:  4238
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 27.3
+MAIN ACCURACY: 84.44
+
+Start Round 254 ...
+Total size:  5209
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 27.31
+MAIN ACCURACY: 84.42
+
+Start Round 255 ...
+Total size:  5139
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 27.57
+MAIN ACCURACY: 84.41
+
+Start Round 256 ...
+Total size:  4682
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0004, device='cuda:0')
+
+BACKDOOR: 27.43
+MAIN ACCURACY: 84.45
+
+Start Round 257 ...
+Total size:  4984
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0005, device='cuda:0')
+
+BACKDOOR: 27.33
+MAIN ACCURACY: 84.43
+
+Start Round 258 ...
+Total size:  4447
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0005, device='cuda:0')
+
+BACKDOOR: 27.53
+MAIN ACCURACY: 84.46
+
+Start Round 259 ...
+Total size:  5244
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0009, device='cuda:0')
+
+BACKDOOR: 27.3
+MAIN ACCURACY: 84.42
+
+Start Round 260 ...
+Total size:  4703
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0014, device='cuda:0')
+
+BACKDOOR: 26.94
+MAIN ACCURACY: 84.35
+
+Start Round 261 ...
+Total size:  5937
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 26.94
+MAIN ACCURACY: 84.3
+
+Start Round 262 ...
+Total size:  5651
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 26.84
+MAIN ACCURACY: 84.27
+
+Start Round 263 ...
+Total size:  4746
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 26.71
+MAIN ACCURACY: 84.33
+
+Start Round 264 ...
+Total size:  5669
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0005, device='cuda:0')
+
+BACKDOOR: 26.6
+MAIN ACCURACY: 84.4
+
+Start Round 265 ...
+Total size:  4823
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 26.57
+MAIN ACCURACY: 84.29
+
+Start Round 266 ...
+Total size:  5002
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 26.42
+MAIN ACCURACY: 84.37
+
+Start Round 267 ...
+Total size:  5102
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 26.5
+MAIN ACCURACY: 84.42
+
+Start Round 268 ...
+Total size:  7044
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0005, device='cuda:0')
+
+BACKDOOR: 26.58
+MAIN ACCURACY: 84.42
+
+Start Round 269 ...
+Total size:  4709
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 26.58
+MAIN ACCURACY: 84.46
+
+Start Round 270 ...
+Total size:  4951
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0005, device='cuda:0')
+
+BACKDOOR: 26.4
+MAIN ACCURACY: 84.53
+
+Start Round 271 ...
+Total size:  4169
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 26.35
+MAIN ACCURACY: 84.52
+
+Start Round 272 ...
+Total size:  4964
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 26.53
+MAIN ACCURACY: 84.51
+
+Start Round 273 ...
+Total size:  4641
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 26.56
+MAIN ACCURACY: 84.56
+
+Start Round 274 ...
+Total size:  4931
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 26.34
+MAIN ACCURACY: 84.55
+
+Start Round 275 ...
+Total size:  3820
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0009, device='cuda:0')
+
+BACKDOOR: 26.35
+MAIN ACCURACY: 84.58
+
+Start Round 276 ...
+Total size:  4890
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 26.23
+MAIN ACCURACY: 84.54
+
+Start Round 277 ...
+Total size:  5455
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 26.05
+MAIN ACCURACY: 84.62
+
+Start Round 278 ...
+Total size:  4934
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0012, device='cuda:0')
+
+BACKDOOR: 26.0
+MAIN ACCURACY: 84.49
+
+Start Round 279 ...
+Total size:  5354
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 25.85
+MAIN ACCURACY: 84.48
+
+Start Round 280 ...
+Total size:  4528
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 25.84
+MAIN ACCURACY: 84.48
+
+Start Round 281 ...
+Total size:  4335
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0011, device='cuda:0')
+
+BACKDOOR: 25.51
+MAIN ACCURACY: 84.41
+
+Start Round 282 ...
+Total size:  4052
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 25.58
+MAIN ACCURACY: 84.4
+
+Start Round 283 ...
+Total size:  4832
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 25.49
+MAIN ACCURACY: 84.45
+
+Start Round 284 ...
+Total size:  4955
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0005, device='cuda:0')
+
+BACKDOOR: 25.67
+MAIN ACCURACY: 84.53
+
+Start Round 285 ...
+Total size:  4177
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0012, device='cuda:0')
+
+BACKDOOR: 25.5
+MAIN ACCURACY: 84.49
+
+Start Round 286 ...
+Total size:  5228
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 25.35
+MAIN ACCURACY: 84.55
+
+Start Round 287 ...
+Total size:  5189
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 25.51
+MAIN ACCURACY: 84.52
+
+Start Round 288 ...
+Total size:  6298
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0005, device='cuda:0')
+
+BACKDOOR: 25.39
+MAIN ACCURACY: 84.49
+
+Start Round 289 ...
+Total size:  5392
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 24.81
+MAIN ACCURACY: 84.49
+
+Start Round 290 ...
+Total size:  4524
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0005, device='cuda:0')
+
+BACKDOOR: 24.86
+MAIN ACCURACY: 84.45
+
+Start Round 291 ...
+Total size:  4609
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 25.0
+MAIN ACCURACY: 84.53
+
+Start Round 292 ...
+Total size:  4730
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 24.76
+MAIN ACCURACY: 84.64
+
+Start Round 293 ...
+Total size:  5594
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0005, device='cuda:0')
+
+BACKDOOR: 24.53
+MAIN ACCURACY: 84.56
+
+Start Round 294 ...
+Total size:  5046
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 24.92
+MAIN ACCURACY: 84.58
+
+Start Round 295 ...
+Total size:  5854
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0009, device='cuda:0')
+
+BACKDOOR: 24.96
+MAIN ACCURACY: 84.57
+
+Start Round 296 ...
+Total size:  4980
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0008, device='cuda:0')
+
+BACKDOOR: 25.05
+MAIN ACCURACY: 84.56
+
+Start Round 297 ...
+Total size:  5057
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0006, device='cuda:0')
+
+BACKDOOR: 24.73
+MAIN ACCURACY: 84.54
+
+Start Round 298 ...
+Total size:  4996
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0004, device='cuda:0')
+
+BACKDOOR: 24.55
+MAIN ACCURACY: 84.53
+
+Start Round 299 ...
+Total size:  5555
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0007, device='cuda:0')
+
+BACKDOOR: 24.5
+MAIN ACCURACY: 84.49
+
+Start Round 300 ...
+Total size:  4862
+SCALED BY: 0.01
+Finished benign test
+Calculating backdoor accuracy
+TRAIN ACCURACY tensor(0.0005, device='cuda:0')
+
+BACKDOOR: 24.51
+MAIN ACCURACY: 84.57
