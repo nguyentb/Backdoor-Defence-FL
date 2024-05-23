@@ -8,29 +8,28 @@ Python3.7
 ## Installation
 ### Create a virtual environment:
 
-'''
+```
   python -m venv venv
-'''
-
+```
 OR
-'''
+```
 python3 -m venv venv
-'''
+```
 
 ### Activate the virtual environment:
-'''
+```
   source venv/bin/activate
-'''
+```
 
 ### Install requirements
-'''
+```
   pip install -r requirements.txt
-'''
+```
 
 ## Running the federated learning
-'''
+```
 python ./src/main.py
-'''
+```
 
 ## End regards
 If you have any questions feel free to reach put to myself via github.
