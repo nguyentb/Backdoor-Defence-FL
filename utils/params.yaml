@@ -13,8 +13,6 @@ preload_model_name: no_attack_new
 start_round: 99
 log_file: defence_with
   
-  
-  _ratio_sibu
 carry_attack: True
 carry_defence: True
 
