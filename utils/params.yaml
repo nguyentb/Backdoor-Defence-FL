@@ -1,31 +1,31 @@
-# Federated Learning
-#preload_model: True
-#load_results: False
-#preload_model_name: no_attack_new
-#start_round: 100
-#log_file: effectOfAttacker
-#carry_attack: True
-#carry_defence: False
-
+# Loading a pretrained model
 preload_model: True
 load_results: False
-preload_model_name: no_attack_new
+preload_model_name: blood_cell_round99
+
+# What round the training is starting at. Useful when loading a model
 start_round: 99
+
+# Name of the log file
 log_file: defence_with
-  
+
+# Carry backdoor attack
 carry_attack: True
+
+# Carry defence mechanism
 carry_defence: True
 
+# Which dataset to use
 dataset: blood cell
 
 
 total_clients: 70
+# How many clients to use in each round
 client_num_proportion: 0.1
 rounds: 100
 dirichlet_alpha: 0.9
 
 lr_decrease_epochs: [60, 99, 160, 200]
-#lr_decrease_epochs: [0, 0, 10, 50]
 
 # Server
 global_lr: 1
