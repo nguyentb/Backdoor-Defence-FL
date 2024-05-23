@@ -1,4 +1,4 @@
-# University of Glasgow - Federated Learning - Marina san José Peña
+# Novel Defence Mechanism for Model Poisoning Attacks in Federated Learning
 
 This project explores federated learning, a machine learning technique that enables training models on distributed devices without sharing raw data.
 
